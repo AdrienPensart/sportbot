@@ -9,7 +9,7 @@ from sportbot.sound import player, bell, say
 def get_tts_path(label):
     path = os.path.abspath(__file__)
     dir_path = os.path.dirname(path)
-    return dir_path + f'/{label}.mp3'
+    return dir_path + f'/tts/{label}.mp3'
 
 
 class Exercice:

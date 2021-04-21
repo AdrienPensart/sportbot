@@ -8,13 +8,17 @@ def seconds_to_human(seconds: int) -> str:
     return str(datetime.timedelta(seconds=seconds))
 
 
-def flatten(iterables):
+def deep_flatten(iterables):
     '''Recursively flatten argument'''
     for element in iterables:
         if isinstance(element, collections.Iterable) and not isinstance(element, (str, bytes)):
-            yield from flatten(element)
+            yield from deep_flatten(element)
         else:
             yield element
+
+
+def flatten(*iterables):
+    return deep_flatten(iterables)
 
 
 def join_exercices(iterable, rest):
@@ -27,7 +31,7 @@ def join_exercices(iterable, rest):
 
     yield first_exercice
     for next_exercice in it:
-        yield rest
+        yield copy.deepcopy(rest)
         n_round += 1
         next_exercice.label = f"{next_exercice.label} (round {n_round}/{total_round})"
         yield next_exercice
@@ -38,4 +42,4 @@ def intersperse(exercices, rest):
 
 
 def rounds(n, exercice, rest):
-    return intersperse([copy.deepcopy(exercice) for _ in range(n)], rest),
+    return flatten(intersperse([copy.deepcopy(exercice) for _ in range(n)], rest))

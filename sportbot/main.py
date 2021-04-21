@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import datetime
+import copy
 import os
 import sys
 import time
@@ -6,9 +8,15 @@ import logging
 import collections
 import vlc
 from colorama import Fore
+from asciimatics.screen import Screen
 
 logger = logging.getLogger(__name__)
 logging.getLogger("vlc").setLevel(logging.NOTSET)
+
+
+def seconds_to_human(seconds: int) -> str:
+    '''Human readable duration from seconds'''
+    return str(datetime.timedelta(seconds=seconds))
 
 
 def flatten(iterables):
@@ -20,24 +28,33 @@ def flatten(iterables):
             yield element
 
 
-def joinit(iterable, delimiter):
+def join_exercices(iterable, rest):
     it = iter(iterable)
-    yield next(it)
-    for x in it:
-        yield delimiter
-        yield x
+    n_round = 1
+    total_round = len(iterable)
+
+    first_exercice = next(it)
+    first_exercice.label = f"{first_exercice.label} (round {n_round}/{total_round})"
+
+    yield first_exercice
+    for next_exercice in it:
+        yield rest
+        n_round += 1
+        next_exercice.label = f"{next_exercice.label} (round {n_round}/{total_round})"
+        yield next_exercice
 
 
-def intersperse(iterable, delimiter):
-    return list(joinit(iterable, delimiter))
+def intersperse(exercices, rest):
+    return list(join_exercices(exercices, rest))
 
 
 def rounds(n, exercice, rest):
-    return intersperse([exercice] * n, rest),
+    return intersperse([copy.deepcopy(exercice) for _ in range(n)], rest),
 
 
 class Exercice:
-    def __init__(self, label, duration, color=Fore.RESET):
+    def __init__(self, label, duration, intensity=10, color=Fore.RESET):
+        self.intensity = intensity
         self.label = label
         self.duration = duration
         self.stopwatch = duration
@@ -48,17 +65,17 @@ class Exercice:
 
 
 prepare = Exercice("Prepare", 5),
-rest = Exercice("Rest", 60, Fore.YELLOW)
-shadow_boxing = Exercice("Boxing", 120, Fore.GREEN)
-
-exercices = [
-    prepare,
-    rounds(12, shadow_boxing, rest),
-]
+one_minute_rest = Exercice("Standard Rest", 60, color=Fore.YELLOW)
+two_minutes_rest = Exercice("Long Rest", 120, color=Fore.YELLOW)
+shadow_boxing = Exercice("Boxing", 120, color=Fore.GREEN)
+jab_cross = Exercice("Jab/Cross", 60, color=Fore.RED)
+uppercuts = Exercice("Uppercuts", 60, color=Fore.RED)
 
 
 class Sportbot:
-    def __init__(self):
+    def __init__(self, exercices):
+        self.exercices = list(flatten(exercices))
+        self.total_duration = sum([exercice.duration for exercice in self.exercices])
         self.instance = vlc.Instance("--vout=dummy --aout=pulse")
         if not self.instance:
             logger.critical('Unable to start VLC instance')
@@ -82,22 +99,39 @@ class Sportbot:
         self.player.set_media_list(media_list)
         self.player.play()
 
+    def display(self, screen, msg):
+        screen.clear()
+        screen.print_at(msg, 0, 0)
+        screen.refresh()
+
     def run(self):
-        def demo(screen):
-            for exercice in flatten(exercices):
-                self.bell()
-                while exercice.stopwatch > 0:
-                    screen.clear()
-                    screen.print_at(f"{exercice}", 0, 0)
-                    screen.refresh()
-                    exercice.stopwatch -= 1
-                    time.sleep(1)
+        def _run(screen):
+            self.display(screen, f"{len(self.exercices)} exercices, duration : {seconds_to_human(self.total_duration)}")
+            time.sleep(2)
+
+            for number, exercice in enumerate(self.exercices):
+                self.run_exercice(number, exercice, screen)
+
             self.bell()
 
-        from asciimatics.screen import Screen
-        Screen.wrapper(demo)
+        Screen.wrapper(_run)
+
+    def run_exercice(self, number, exercice, screen):
+        self.bell()
+        while exercice.stopwatch > 0:
+            self.display(screen, f"{number}/{len(self.exercices)} : {exercice}")
+            exercice.stopwatch -= 1
+            time.sleep(1)
+            self.player.stop()
 
 
 def main():
-    bot = Sportbot()
+    exercices = [
+        prepare,
+        rounds(12, shadow_boxing, one_minute_rest),
+        two_minutes_rest,
+    ]
+    # for exercice in flatten(exercices):
+    #     print(exercice)
+    bot = Sportbot(exercices)
     bot.run()

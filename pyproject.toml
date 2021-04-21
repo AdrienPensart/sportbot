@@ -9,6 +9,8 @@ python = "^3.8"
 asciimatics = "^1.13.0"
 colorama = "^0.4.4"
 python-vlc = "^3.0.12118"
+gTTS = "^2.2.2"
+python-slugify = "^4.0.1"
 
 [tool.poetry.dev-dependencies]
 

@@ -8,18 +8,8 @@ from sportbot.bot import Sportbot
 logger = logging.getLogger(__name__)
 logging.getLogger("vlc").setLevel(logging.NOTSET)
 
-prepare = Exercice(
-    label="Prepare",
-    duration=5,
-    color=Fore.GREEN,
-)
-
-maintain = Exercice(
-    label="Maintain",
-    duration=1,
-    silence=True,
-    color=Fore.YELLOW,
-)
+prepare = Exercice(label="Prepare", duration=5, color=Fore.GREEN)
+maintain = Exercice(label="Maintain", duration=1, silence=True, color=Fore.YELLOW)
 
 # RESTS
 _15_seconds_rest = Exercice("Rest", duration=15, color=Fore.YELLOW, tags=['rest'])
@@ -116,6 +106,6 @@ _12_double_ended_bag_boxing_rounds_2_minutes = flatten(
 
 
 def main():
-    # bot = Sportbot(_12_rounds_2_minutes_shadow_boxing)
-    bot = Sportbot(_10_rhythmic_push_up)
+    bot = Sportbot(_12_rounds_2_minutes_shadow_boxing)
+    # bot = Sportbot(_10_rhythmic_push_up)
     bot.run()

@@ -1,10 +1,25 @@
 import time
+import os
+from slugify import slugify
+from gtts import gTTS
 from colorama import Fore
-from sportbot.bell import player, ring
+from sportbot.sound import player, bell, say
+
+
+def get_tts_path(label):
+    path = os.path.abspath(__file__)
+    dir_path = os.path.dirname(path)
+    return dir_path + f'/{label}.mp3'
 
 
 class Exercice:
     def __init__(self, label, duration, silence=False, intensity=10, color=Fore.RESET, tags=None):
+
+        self.tts_path = get_tts_path(slugify(label))
+        if not os.path.isfile(self.tts_path):
+            tts = gTTS(label)
+            tts.save(self.tts_path)
+
         self.tags = tags if tags is not None else []
         self.intensity = intensity
         self.label = label
@@ -18,7 +33,9 @@ class Exercice:
 
     def run(self, number, length, sportscreen):
         if not self.silence:
-            ring()
+            wait_for = say(self.tts_path)
+            time.sleep(wait_for)
+            bell()
         while self.stopwatch > 0:
             sportscreen.display(f"{number}/{length} : {self}")
             self.stopwatch -= 1

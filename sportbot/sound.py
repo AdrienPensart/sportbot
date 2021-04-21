@@ -1,4 +1,5 @@
 import logging
+import time
 import os
 import functools
 import sys
@@ -31,11 +32,21 @@ def bell_path():
     return dir_path + '/bell.wav'
 
 
-def ring():
+def say(path):
     player().stop()
-    media_list = instance().media_list_new([bell_path()])
+    media_list = instance().media_list_new([path])
     if not media_list:
         logger.critical('Unable to create VLC media list')
         return
     player().set_media_list(media_list)
     player().play()
+
+    media_player = player().get_media_player()
+    media = media_player.get_media()
+    media.parse()
+    return media_player.get_length() / 1000
+
+
+def bell():
+    say(bell_path())
+    time.sleep(1)

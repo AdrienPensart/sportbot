@@ -1,6 +1,5 @@
 import logging
 from asciimatics.screen import Screen
-from sportbot.sequence import Sequence
 from sportbot.screen import SportScreen
 from sportbot.sound import bell
 
@@ -8,8 +7,8 @@ logger = logging.getLogger(__name__)
 
 
 class Sportbot:
-    def __init__(self, exercices):
-        self.sequence = Sequence(exercices)
+    def __init__(self, sequence):
+        self.sequence = sequence
 
     def run(self):
         def _run(screen):

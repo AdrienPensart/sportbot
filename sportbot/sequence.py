@@ -2,9 +2,14 @@ from sportbot.helpers import flatten, seconds_to_human
 
 
 class Sequence:
-    def __init__(self, exercices):
+    def __init__(self, name, exercices, tags=None):
+        self.name = name
+        self.tags = tags if tags is not None else []
         self.exercices = exercices
         self.exercices = list(flatten(exercices))
+
+    def __repr__(self):
+        return f"{self.name} {self.tags}"
 
     @property
     def length(self):

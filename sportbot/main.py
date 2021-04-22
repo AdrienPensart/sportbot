@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 import logging
+import click
 from colorama import Fore
+from click_skeleton import skeleton, doc, backtrace
+from sportbot import version
+from sportbot.sequence import Sequence
 from sportbot.exercice import Exercice
 from sportbot.helpers import rounds, flatten
 from sportbot.bot import Sportbot
 
+PROG_NAME = "sportbot"
 logger = logging.getLogger(__name__)
 logging.getLogger("vlc").setLevel(logging.NOTSET)
 
@@ -94,18 +99,80 @@ _3_minutes_shadow_boxing = Exercice("Shadow boxing", duration=180, color=Fore.RE
 _2_minutes_double_ended_bag_boxing = Exercice("Double-ended bag boxing", duration=120, color=Fore.RED, tags=['boxing'])
 _3_minutes_double_ended_bag_boxing = Exercice("Double-ended bag boxing", duration=180, color=Fore.RED, tags=['boxing'])
 
-_12_rounds_2_minutes_shadow_boxing = flatten(
-    prepare,
-    rounds(12, _2_minutes_shadow_boxing, _60_seconds_rest),
+
+backtrace.hook(
+    reverse=False,
+    align=True,
+    strip_path=False,
+    enable_on_envvar_only=False,
+    on_tty=False,
+    conservative=False,
 )
 
-_12_double_ended_bag_boxing_rounds_2_minutes = flatten(
-    prepare,
-    rounds(12, _2_minutes_double_ended_bag_boxing, _1_minute_rest),
-)
+sequences = [
+    Sequence(
+        name="12_rounds_2_minutes_shadow_boxing",
+        exercices=flatten(
+            prepare,
+            rounds(12, _2_minutes_shadow_boxing, _60_seconds_rest),
+        ),
+        tags=["boxing"],
+    ),
+    Sequence(
+        name="12_double_ended_bag_boxing_rounds_2_minutes",
+        exercices=flatten(
+            prepare,
+            rounds(12, _2_minutes_double_ended_bag_boxing, _1_minute_rest),
+        ),
+        tags=["boxing"],
+    ),
+]
 
 
-def main():
-    bot = Sportbot(_12_rounds_2_minutes_shadow_boxing)
-    # bot = Sportbot(_10_rhythmic_push_up)
-    bot.run()
+@skeleton(name=PROG_NAME, version=version.__version__, auto_envvar_prefix='SP')
+def cli():
+    """SportBot."""
+
+
+@cli.command('sequences', help='List available sequences')
+@click.option('--tag', 'tags', help="Tag filter", multiple=True)
+def _sequences(tags):
+    for sequence in sequences:
+        if tags:
+            for tag in tags:
+                if tag in sequence.tags:
+                    print(sequence)
+        else:
+            print(sequence)
+
+
+@cli.command(help='List available tags')
+def tags():
+    unique_tags = set()
+    for sequence in sequences:
+        unique_tags.update(sequence.tags)
+    for unique_tag in unique_tags:
+        print(unique_tag)
+
+
+@cli.command(help='Start sequence')
+@click.argument('name')
+def start(name):
+    for sequence in sequences:
+        if name == sequence.name:
+            bot = Sportbot(sequence)
+            bot.run()
+            return
+    print("Unknown sequence")
+
+
+@cli.command(short_help='Generates a README.rst', aliases=['doc'])
+@click.pass_context
+@click.option('--output', help='README output format', type=click.Choice(['rst', 'markdown']), default='rst', show_default=True)
+def readme(ctx, output):
+    '''Generates a complete readme'''
+    doc.readme(cli, ctx.obj.prog_name, ctx.obj.context_settings, output)
+
+
+def main(**kwargs):
+    return cli.main(prog_name=PROG_NAME, **kwargs)

@@ -27,13 +27,13 @@ def join_exercices(iterable, rest):
     total_round = len(iterable)
 
     first_exercice = next(it)
-    first_exercice.label = f"{first_exercice.label} (round {n_round}/{total_round})"
+    first_exercice.name = f"{first_exercice.name}, round {n_round} on {total_round}"
 
     yield first_exercice
     for next_exercice in it:
         yield copy.deepcopy(rest)
         n_round += 1
-        next_exercice.label = f"{next_exercice.label} (round {n_round}/{total_round})"
+        next_exercice.name = f"{next_exercice.name}, round {n_round} on {total_round}"
         yield next_exercice
 
 

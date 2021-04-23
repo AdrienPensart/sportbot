@@ -1,5 +1,7 @@
 import logging
+import time
 from asciimatics.screen import Screen
+from colorama import Fore
 from sportbot.screen import SportScreen
 from sportbot.sound import bell
 
@@ -10,12 +12,20 @@ class Sportbot:
     def __init__(self, sequence):
         self.sequence = sequence
 
-    def run(self):
-        def _run(screen):
-            sportscreen = SportScreen(screen)
-            sportscreen.display(f"{self.sequence.length} exercices, duration : {self.sequence.human_total_duration}")
+    def run(self, dry=False):
+        def _run(screen=None):
+            if screen:
+                sportscreen = SportScreen(screen)
+                sportscreen.display(f"{Fore.BLUE}{self.sequence}{Fore.RESET}")
+                time.sleep(5)
             for number, exercice in enumerate(self.sequence.exercices):
-                exercice.run(number, self.sequence.length, sportscreen)
+                if screen:
+                    exercice.run(number, self.sequence.length, sportscreen)
+                else:
+                    print(exercice)
             bell()
 
-        Screen.wrapper(_run)
+        if not dry:
+            Screen.wrapper(_run)
+        else:
+            _run()

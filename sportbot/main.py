@@ -1,20 +1,24 @@
 #!/usr/bin/env python3
 import logging
 import click
+import colorama
+from gtts import gTTS
 from colorama import Fore
-from click_skeleton import skeleton, doc, backtrace
+from click_skeleton import skeleton, doc, backtrace, ExpandedPath
 from sportbot import version
 from sportbot.sequence import Sequence
 from sportbot.exercice import Exercice
 from sportbot.helpers import rounds, flatten
 from sportbot.bot import Sportbot
 
+colorama.deinit()
+
 PROG_NAME = "sportbot"
 logger = logging.getLogger(__name__)
 logging.getLogger("vlc").setLevel(logging.NOTSET)
 
-prepare = Exercice(label="Prepare", duration=5, color=Fore.GREEN)
-maintain = Exercice(label="Maintain", duration=1, silence=True, color=Fore.YELLOW)
+prepare = Exercice("Prepare", duration=20, color=Fore.GREEN)
+maintain = Exercice("Maintain", duration=1, silence=True, color=Fore.YELLOW)
 
 # RESTS
 _15_seconds_rest = Exercice("Rest", duration=15, color=Fore.YELLOW, tags=['rest'])
@@ -119,7 +123,7 @@ sequences = [
         tags=["boxing"],
     ),
     Sequence(
-        name="12_double_ended_bag_boxing_rounds_2_minutes",
+        name="12 double ended bag boxing rounds 2 minutes",
         exercices=flatten(
             prepare,
             rounds(12, _2_minutes_double_ended_bag_boxing, _1_minute_rest),
@@ -132,6 +136,30 @@ sequences = [
 @skeleton(name=PROG_NAME, version=version.__version__, auto_envvar_prefix='SP')
 def cli():
     """SportBot."""
+
+
+@cli.command(help='Create custom rounds')
+@click.option('--dry', is_flag=True)
+@click.option('--name', default="Rounds")
+@click.option('--rounds', '_rounds', type=int, default=12)
+@click.option('--duration', type=int, default=120)
+@click.option('--prepare', type=int, default=10)
+@click.option('--rest', type=int, default=60)
+def boxing(name, prepare, duration, rest, dry, _rounds):
+    _round = Exercice("Boxing", duration=duration, color=Fore.RED, tags=['boxing'])
+    _rest = Exercice("Rest", duration=rest, color=Fore.YELLOW, tags=['rest'])
+    all_rounds = flatten(
+        Exercice("Prepare", duration=prepare, color=Fore.GREEN),
+        rounds(_rounds, _round, _rest),
+        Exercice("The End", duration=5, color=Fore.GREEN),
+    ),
+    sequence = Sequence(
+        name=name,
+        exercices=all_rounds,
+        tags=["boxing"],
+    )
+    bot = Sportbot(sequence)
+    bot.run(dry)
 
 
 @cli.command('sequences', help='List available sequences')
@@ -153,6 +181,20 @@ def tags():
         unique_tags.update(sequence.tags)
     for unique_tag in unique_tags:
         print(unique_tag)
+
+
+@cli.command(help='Generate sound')
+@click.argument("name")
+@click.option(
+    "--path",
+    help="Sound output path",
+    type=ExpandedPath(exists=True, dir_okay=True, file_okay=False),
+    default='.',
+    show_default=True,
+)
+def generate_sound(name, path):
+    tts = gTTS(name)
+    tts.save(path)
 
 
 @cli.command(help='Start sequence')

@@ -5,11 +5,10 @@ class Sequence:
     def __init__(self, name, exercices, tags=None):
         self.name = name
         self.tags = tags if tags is not None else []
-        self.exercices = exercices
         self.exercices = list(flatten(exercices))
 
     def __repr__(self):
-        return f"{self.name} {self.tags}"
+        return f"{self.name} {self.tags}, {self.length} exercices, duration : {self.human_total_duration}"
 
     @property
     def length(self):

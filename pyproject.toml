@@ -11,7 +11,7 @@ colorama = "^0.4.4"
 python-vlc = "^3.0.12118"
 gTTS = "^2.2.2"
 python-slugify = "^4.0.1"
-click-skeleton = "^0.12"
+click-skeleton = "^0.13"
 
 [tool.poetry.dev-dependencies]
 

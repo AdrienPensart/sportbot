@@ -3,13 +3,13 @@ import time
 import os
 import functools
 import sys
-import vlc
+import vlc  # type: ignore
 
 logger = logging.getLogger(__name__)
 
 
 @functools.lru_cache(maxsize=None)
-def instance():
+def vlc_instance():
     _instance = vlc.Instance("--vout=dummy --aout=pulse")
     if not _instance:
         logger.critical('Unable to start VLC instance')
@@ -19,7 +19,7 @@ def instance():
 
 @functools.lru_cache(maxsize=None)
 def player():
-    _player = instance().media_list_player_new()
+    _player = vlc_instance().media_list_player_new()
     if not _player:
         logger.critical('Unable to create VLC player')
         sys.exit(1)
@@ -34,10 +34,10 @@ def bell_path():
 
 def say(path):
     player().stop()
-    media_list = instance().media_list_new([path])
+    media_list = vlc_instance().media_list_new([path])
     if not media_list:
         logger.critical('Unable to create VLC media list')
-        return
+        sys.exit(1)
     player().set_media_list(media_list)
     player().play()
 

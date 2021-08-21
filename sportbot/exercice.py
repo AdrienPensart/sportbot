@@ -1,8 +1,10 @@
+from typing import FrozenSet
 import time
 import os
+import click
+import attr
 from slugify import slugify
-from gtts import gTTS
-from colorama import Fore
+from gtts import gTTS  # type: ignore
 from sportbot.sound import player, bell, say
 
 
@@ -12,20 +14,30 @@ def default_tts_path(name):
     return f'{dir_path}/tts/{name}.mp3'
 
 
+known_exercices = set()
+
+
+@attr.s(auto_attribs=True, hash=True, repr=False)
 class Exercice:
-    def __init__(self, name, duration, silence=False, color=Fore.RESET, tags=None):
-        self.tags = tags if tags is not None else []
-        self.name = name
-        self.duration = duration
-        self.stopwatch = duration
-        self.color = color
-        self.silence = silence
+    name: str
+    duration: int
+    silence: bool = False
+    stopwatch: int = 0
+    color: str = "yellow"
+    tags: FrozenSet[str] = attr.ib(default=frozenset(), converter=frozenset)
+
+    def __attrs_post_init__(self) -> None:
+        self.stopwatch = self.duration
+        if not isinstance(self, Waiting):
+            known_exercices.add(self)
 
     def __repr__(self):
-        return f"{self.color}{self.name} : {self.stopwatch} / {self.duration}{Fore.RESET}"
+        if self.stopwatch != self.duration:
+            return click.style(f"{self.name} : {self.stopwatch} / {self.duration} seconds", fg=self.color)
+        return click.style(f"{self.name} : {self.stopwatch} seconds ", fg=self.color)
 
     @property
-    def tts_path(self):
+    def tts_path(self) -> str:
         slug = slugify(self.name)
         _tts_path = default_tts_path(slug)
         if not os.path.isfile(_tts_path):
@@ -34,13 +46,33 @@ class Exercice:
             tts.save(_tts_path)
         return _tts_path
 
-    def run(self, number, length, sportscreen):
-        if not self.silence:
+    def run(self, number, length, dry):
+        if not self.silence and not dry:
             wait_for = say(self.tts_path)
             time.sleep(wait_for)
             bell()
         while self.stopwatch > 0:
-            sportscreen.display(f"{number}/{length} : {self}")
+            print(f"{number}/{length} : {self}")
             self.stopwatch -= 1
-            time.sleep(1)
-            player().stop()
+
+            if not dry:
+                time.sleep(1)
+                player().stop()
+
+
+@attr.s(auto_attribs=True, hash=True, repr=False)
+class Waiting(Exercice):
+    color: str = "bright_blue"
+
+
+@attr.s(auto_attribs=True, hash=True, repr=False)
+class Rest(Waiting):
+    name: str = attr.ib(default="Rest")
+    color: str = "green"
+    tags: FrozenSet[str] = frozenset({"rest"})
+
+
+@attr.s(auto_attribs=True, hash=True, repr=False)
+class Boxing(Exercice):
+    color: str = "red"
+    tags: FrozenSet[str] = frozenset({"boxing"})

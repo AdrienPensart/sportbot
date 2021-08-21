@@ -1,19 +1,22 @@
 [tool.poetry]
 name = "sportbot"
 version = "0.1.0"
-description = ""
+description = "SportBox personal trainer"
 authors = ["Adrien Pensart <adrien.pensart@corp.ovh.com>"]
 
 [tool.poetry.dependencies]
 python = ">=3.6,<=3.9"
-asciimatics = "^1.13.0"
-colorama = "^0.4.4"
 python-vlc = "^3.0.12118"
 gTTS = "^2.2.2"
-python-slugify = "^4.0.1"
-click-skeleton = "^0.13"
+click-skeleton = "^0.15"
+python-slugify = "^5.0.2"
+types-python-slugify = "^0.1.2"
+attrs = "^21.2.0"
 
 [tool.poetry.dev-dependencies]
+pylint = "^2.10.2"
+mypy = "^0.910"
+restructuredtext-lint = "^1.3.2"
 
 [tool.poetry.scripts]
 sportbot = 'sportbot.main:main'
@@ -21,3 +24,10 @@ sportbot = 'sportbot.main:main'
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pylint.master]
+jobs = 4
+[tool.pylint.messages_control]
+disable = """
+disable=too-few-public-methods,logging-format-interpolation,line-too-long,too-many-arguments,protected-access,missing-docstring,invalid-name,too-many-public-methods,too-many-instance-attributes,duplicate-code,too-many-nested-blocks,too-many-branches,too-many-return-statements,too-many-statements,too-many-locals,too-few-public-methods,too-many-ancestors,abstract-method,anomalous-backslash-in-string,import-outside-toplevel,redefined-outer-name,unnecessary-lambda,c-extension-no-member,logging-fstring-interpolation
+"""

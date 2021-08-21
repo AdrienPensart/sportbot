@@ -1,136 +1,20 @@
 #!/usr/bin/env python3
 import logging
 import click
-import colorama
-from gtts import gTTS
-from colorama import Fore
+from gtts import gTTS  # type: ignore
 from click_skeleton import skeleton, doc, backtrace, ExpandedPath
 from sportbot import version
 from sportbot.sequence import Sequence
-from sportbot.exercice import Exercice
-from sportbot.helpers import rounds, flatten
-from sportbot.bot import Sportbot
-
-colorama.deinit()
+from sportbot.exercice import known_exercices, Rest, Waiting, Boxing
+from sportbot.boxing import boxing_training  # type: ignore
+from sportbot.helpers import rounds, flatten, Py2Key
 
 PROG_NAME = "sportbot"
 logger = logging.getLogger(__name__)
 logging.getLogger("vlc").setLevel(logging.NOTSET)
+backtrace.hook(reverse=False, align=True, strip_path=False, enable_on_envvar_only=False, on_tty=False, conservative=False)
 
-prepare = Exercice("Prepare", duration=20, color=Fore.GREEN)
-maintain = Exercice("Maintain", duration=1, silence=True, color=Fore.YELLOW)
-
-# RESTS
-_15_seconds_rest = Exercice("Rest", duration=15, color=Fore.YELLOW, tags=['rest'])
-_30_seconds_rest = Exercice("Rest", duration=30, color=Fore.YELLOW, tags=['rest'])
-_45_seconds_rest = Exercice("Rest", duration=45, color=Fore.YELLOW, tags=['rest'])
-_60_seconds_rest = _1_minute_rest = Exercice("Rest", duration=60, color=Fore.YELLOW, tags=['rest'])
-_120_seconds_rest = _2_minutes_rest = Exercice("Rest", duration=120, color=Fore.YELLOW, tags=['rest'])
-
-# SIMPLE
-
-# Warm-Up
-_30_seconds_heels_rise = Exercice("Heels rise", duration=30, color=Fore.GREEN, tags=['warming-up'])
-_30_seconds_knees_rise = Exercice("Knees rise", duration=30, color=Fore.GREEN, tags=['warming-up'])
-_30_seconds_heels_to_buttocks = Exercice("Heels to buttocks", duration=30, color=Fore.GREEN, tags=['warming-up'])
-
-# Jumping jacks
-_30_seconds_jumping_jacks = Exercice("Jumping jacks", duration=30, color=Fore.YELLOW, tags=['warming-up', 'strengthening'])
-_60_seconds_jumping_jacks = Exercice("Jumping jacks", duration=60, color=Fore.YELLOW, tags=['warming-up', 'strengthening'])
-
-# Lunges
-_30_seconds_forward_lunges = Exercice("Forward lunges", duration=30, color=Fore.YELLOW, tags=['warming-up', 'strengthening'])
-_60_seconds_backward_lunges = Exercice("Backward lunges", duration=60, color=Fore.YELLOW, tags=['warming-up', 'strengthening'])
-
-# Alternate lunges
-_30_seconds_alternate_lunges = Exercice("Alternate lunges", duration=30, color=Fore.YELLOW, tags=['strengthening'])
-_60_seconds_alternate_lunges = Exercice("Alternate lunges", duration=60, color=Fore.YELLOW, tags=['strengthening'])
-
-# Crunchs
-_30_seconds_crunchs = Exercice("Crunchs", duration=30, color=Fore.YELLOW, tags=['strengthening'])
-_60_seconds_crunchs = Exercice("Crunchs", duration=60, color=Fore.YELLOW, tags=['strengthening'])
-
-# Twists
-_30_seconds_twists = Exercice("Twists", duration=30, color=Fore.YELLOW, tags=['strengthening'])
-_60_seconds_twists = Exercice("Twists", duration=60, color=Fore.YELLOW, tags=['strengthening'])
-
-# Mountain climbers
-_30_seconds_mountain_climber = Exercice("Mountain climber", duration=30, color=Fore.YELLOW, tags=['warming-up', 'strengthening'])
-_60_seconds_mountain_climber = Exercice("Mountain climber", duration=60, color=Fore.YELLOW, tags=['warming-up', 'strengthening'])
-
-# Plank
-_30_seconds_plank = Exercice("Plank", duration=30, color=Fore.YELLOW, tags=['strengthening'])
-_60_seconds_plank = Exercice("Plank", duration=60, color=Fore.YELLOW, tags=['strengthening'])
-
-# Chair
-_30_seconds_chair = Exercice("Chair", duration=30, color=Fore.YELLOW, tags=['strengthening'])
-_60_seconds_chair = Exercice("Chair", duration=60, color=Fore.YELLOW, tags=['strengthening'])
-
-# Squats
-_30_seconds_squats = Exercice("Squats", duration=30, color=Fore.YELLOW, tags=['strengthening'])
-_60_seconds_squats = Exercice("Squats", duration=60, color=Fore.YELLOW, tags=['strengthening'])
-
-# Squats
-_30_seconds_jump_squats = Exercice("Jump squats", duration=30, color=Fore.YELLOW, tags=['strengthening'])
-_60_seconds_jump_squats = Exercice("Jump squats", duration=60, color=Fore.YELLOW, tags=['strengthening'])
-
-# Burpees
-_30_seconds_burpees = Exercice("Burpees", duration=30, color=Fore.YELLOW, tags=['strengthening'])
-_60_seconds_burpees = Exercice("Burpees", duration=60, color=Fore.YELLOW, tags=['strengthening'])
-
-# Push-ups
-_10_push_up = Exercice("10 push-ups", duration=60, color=Fore.YELLOW, tags=['warming-up', 'strengthening'])
-rhythmic_push_up = Exercice("Push-up", duration=2, tags=['strengthening'])
-_10_rhythmic_push_up = rounds(10, rhythmic_push_up, maintain)
-
-# Kicks
-_30_seconds_jab_cross = Exercice("Jab/Cross", duration=30, color=Fore.YELLOW, tags=['boxing'])
-_60_seconds_jab_cross = _1_minute_jab_cross = Exercice("Jab/Cross", duration=60, color=Fore.YELLOW, tags=['boxing'])
-
-_30_seconds_uppercuts = Exercice("Left/right uppercuts", duration=30, color=Fore.YELLOW, tags=['boxing'])
-_60_seconds_uppercuts = _1_minute_uppercuts = Exercice("Left/right uppercuts", duration=60, color=Fore.YELLOW, tags=['boxing'])
-
-_30_seconds_hooks = Exercice("Left/right hooks", duration=30, color=Fore.YELLOW, tags=['boxing'])
-_60_seconds_hooks = _1_minute_hooks = Exercice("Left/right hooks", duration=60, color=Fore.YELLOW, tags=['boxing'])
-
-_30_seconds_knee_kicks = Exercice("Knee kicks", duration=30, color=Fore.YELLOW, tags=['boxing'])
-_60_seconds_knee_kicks = _1_minute_knee_kicks = Exercice("Knee kicks", duration=60, color=Fore.YELLOW, tags=['boxing'])
-
-# Boxing
-_2_minutes_shadow_boxing = Exercice("Shadow boxing", duration=120, color=Fore.RED, tags=['boxing'])
-_3_minutes_shadow_boxing = Exercice("Shadow boxing", duration=180, color=Fore.RED, tags=['boxing'])
-
-_2_minutes_double_ended_bag_boxing = Exercice("Double-ended bag boxing", duration=120, color=Fore.RED, tags=['boxing'])
-_3_minutes_double_ended_bag_boxing = Exercice("Double-ended bag boxing", duration=180, color=Fore.RED, tags=['boxing'])
-
-
-backtrace.hook(
-    reverse=False,
-    align=True,
-    strip_path=False,
-    enable_on_envvar_only=False,
-    on_tty=False,
-    conservative=False,
-)
-
-sequences = [
-    Sequence(
-        name="12_rounds_2_minutes_shadow_boxing",
-        exercices=flatten(
-            prepare,
-            rounds(12, _2_minutes_shadow_boxing, _60_seconds_rest),
-        ),
-        tags=["boxing"],
-    ),
-    Sequence(
-        name="12 double ended bag boxing rounds 2 minutes",
-        exercices=flatten(
-            prepare,
-            rounds(12, _2_minutes_double_ended_bag_boxing, _1_minute_rest),
-        ),
-        tags=["boxing"],
-    ),
-]
+dry_option = click.option('--dry', is_flag=True)
 
 
 @skeleton(name=PROG_NAME, version=version.__version__, auto_envvar_prefix='SP')
@@ -139,52 +23,60 @@ def cli():
 
 
 @cli.command(help='Create custom rounds')
-@click.option('--dry', is_flag=True)
+@dry_option
 @click.option('--name', default="Rounds")
 @click.option('--rounds', '_rounds', type=int, default=12)
 @click.option('--duration', type=int, default=120)
 @click.option('--prepare', type=int, default=10)
 @click.option('--rest', type=int, default=60)
 def boxing(name, prepare, duration, rest, dry, _rounds):
-    _round = Exercice("Boxing", duration=duration, color=Fore.RED, tags=['boxing'])
-    _rest = Exercice("Rest", duration=rest, color=Fore.YELLOW, tags=['rest'])
+    _round = Boxing("Boxing", duration=duration)
+    _rest = Rest(duration=rest)
     all_rounds = flatten(
-        Exercice("Prepare", duration=prepare, color=Fore.GREEN),
-        rounds(_rounds, _round, _rest),
-        Exercice("The End", duration=5, color=Fore.GREEN),
-    ),
+        Waiting("Prepare", duration=prepare),
+        rounds(n=_rounds, exercice=_round, rest=_rest),
+        Waiting("The End", duration=5),
+    )
     sequence = Sequence(
         name=name,
         exercices=all_rounds,
-        tags=["boxing"],
+        tags={"boxing"},
     )
-    bot = Sportbot(sequence)
-    bot.run(dry)
+    sequence.run(dry)
 
 
 @cli.command('sequences', help='List available sequences')
 @click.option('--tag', 'tags', help="Tag filter", multiple=True)
-def _sequences(tags):
-    for sequence in sequences:
+def _sequences(tags: str):
+    for sequence in boxing_training.sequences:
+        if tags and not any(tag in sequence.tags for tag in tags):
+            continue
+        print(sequence)
+        for exercice in sequence.exercices:
+            print(f"   {exercice}")
+
+
+@cli.command('exercices', help='List available exercices')
+@click.option('--tag', 'tags', help="Tag filter", multiple=True)
+def _exercices(tags: str):
+    for exercice in sorted(known_exercices, key=Py2Key):
         if tags:
             for tag in tags:
-                if tag in sequence.tags:
-                    print(sequence)
+                if tag not in exercice.tags:
+                    print(exercice)
         else:
-            print(sequence)
+            print(exercice)
 
 
 @cli.command(help='List available tags')
 def tags():
-    unique_tags = set()
-    for sequence in sequences:
-        unique_tags.update(sequence.tags)
-    for unique_tag in unique_tags:
-        print(unique_tag)
+    for tag in boxing_training.tags:
+        print(tag)
 
 
 @cli.command(help='Generate sound')
 @click.argument("name")
+@dry_option
 @click.option(
     "--path",
     help="Sound output path",
@@ -192,18 +84,19 @@ def tags():
     default='.',
     show_default=True,
 )
-def generate_sound(name, path):
+def generate_sound(name, dry, path):
     tts = gTTS(name)
-    tts.save(path)
+    if not dry:
+        tts.save(path)
 
 
 @cli.command(help='Start sequence')
 @click.argument('name')
-def start(name):
-    for sequence in sequences:
+@dry_option
+def start(name, dry):
+    for sequence in boxing_training.sequences:
         if name == sequence.name:
-            bot = Sportbot(sequence)
-            bot.run()
+            sequence.run(dry)
             return
     print("Unknown sequence")
 

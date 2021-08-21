@@ -1,6 +1,21 @@
+import sys
 import datetime
 import copy
 import collections
+
+
+class Py2Key:
+    __slots__ = ("value", "typestr")
+
+    def __init__(self, value):
+        self.value = value
+        self.typestr = sys.intern(type(value).__name__)
+
+    def __lt__(self, other):
+        try:
+            return self.value < other.value
+        except TypeError:
+            return self.typestr < other.typestr
 
 
 def seconds_to_human(seconds: int) -> str:
@@ -18,7 +33,7 @@ def deep_flatten(iterables):
 
 
 def flatten(*iterables):
-    return deep_flatten(iterables)
+    return list(deep_flatten(iterables))
 
 
 def join_exercices(iterable, rest):
@@ -26,10 +41,13 @@ def join_exercices(iterable, rest):
     n_round = 1
     total_round = len(iterable)
 
-    first_exercice = next(it)
-    first_exercice.name = f"{first_exercice.name}, round {n_round} on {total_round}"
+    try:
+        first_exercice = next(it)
+        first_exercice.name = f"{first_exercice.name}, round {n_round} on {total_round}"
+        yield first_exercice
+    except StopIteration:
+        pass
 
-    yield first_exercice
     for next_exercice in it:
         yield copy.deepcopy(rest)
         n_round += 1

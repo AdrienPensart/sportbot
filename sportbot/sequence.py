@@ -1,6 +1,7 @@
 from typing import FrozenSet, Optional, List
 import click
 import attr
+import progressbar  # type: ignore
 from sportbot.helpers import seconds_to_human
 from sportbot.sound import bell
 from sportbot.exercice import Exercice, Rest, Waiting
@@ -15,11 +16,15 @@ class Sequence:
 
     def run(self, dry=False):
         number = 0
-        for exercice in self.exercices:
-            if not isinstance(exercice, Waiting):
-                number += 1
-            print(self)
-            exercice.run(number=number, length=self.length, dry=dry)
+        widgets = [progressbar.Variable("progression", format='{formatted_value}')]
+        print(self)
+        with progressbar.ProgressBar(max_value=self.length, widgets=widgets) as pbar:
+            for exercice in self.exercices:
+                if not isinstance(exercice, Waiting):
+                    number += 1
+                prefix = f"{number}/{self.length}, ({self.human_left_stopwatch} remaining)"
+                exercice.run(prefix=prefix, dry=dry, pbar=pbar)
+                pbar.update(number)
 
         if not dry:
             bell()
@@ -34,12 +39,20 @@ class Sequence:
         return click.style(representation, fg="magenta")
 
     @property
+    def only_rest(self):
+        return list(filter(lambda exercice: isinstance(exercice, Rest), self.exercices))
+
+    @property
+    def only_exercices(self):
+        return list(filter(lambda exercice: isinstance(exercice, Exercice), self.exercices))
+
+    @property
     def length(self):
-        return len([exercice for exercice in self.exercices if not isinstance(exercice, Waiting)])
+        return len(self.only_exercices)
 
     @property
     def total_duration(self) -> int:
-        return sum([exercice.duration for exercice in self.exercices])
+        return self.exercices_duration + self.rest_duration
 
     @property
     def human_total_duration(self) -> str:
@@ -47,7 +60,7 @@ class Sequence:
 
     @property
     def rest_duration(self) -> int:
-        return sum([exercice.duration for exercice in self.exercices if isinstance(exercice, Rest)])
+        return sum([rest.duration for rest in self.only_rest])
 
     @property
     def human_rest_duration(self) -> str:
@@ -55,7 +68,7 @@ class Sequence:
 
     @property
     def exercices_duration(self) -> int:
-        return sum([exercice.duration for exercice in self.exercices if not isinstance(exercice, Waiting)])
+        return sum([exercice.duration for exercice in self.only_exercices])
 
     @property
     def human_exercices_duration(self) -> str:
@@ -63,7 +76,7 @@ class Sequence:
 
     @property
     def left_stopwatch(self) -> int:
-        return sum([exercice.stopwatch for exercice in self.exercices])
+        return sum([exercice.stopwatch for exercice in self.exercices if type(exercice) != Waiting])  # pylint: disable=unidiomatic-typecheck
 
     @property
     def human_left_stopwatch(self) -> str:

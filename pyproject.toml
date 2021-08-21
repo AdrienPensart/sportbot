@@ -12,6 +12,7 @@ click-skeleton = "^0.15"
 python-slugify = "^5.0.2"
 types-python-slugify = "^0.1.2"
 attrs = "^21.2.0"
+progressbar2 = "^3.53.1"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.10.2"

@@ -18,12 +18,12 @@ known_exercices = set()
 
 
 @attr.s(auto_attribs=True, hash=True, repr=False)
-class Exercice:
+class BaseExercice:
     name: str
     duration: int
+    color: str
     silence: bool = False
     stopwatch: int = 0
-    color: str = "yellow"
     tags: FrozenSet[str] = attr.ib(default=frozenset(), converter=frozenset)
 
     def __attrs_post_init__(self) -> None:
@@ -46,13 +46,18 @@ class Exercice:
             tts.save(_tts_path)
         return _tts_path
 
-    def run(self, number, length, dry):
+    def run(self, prefix, dry=False, pbar=None):
         if not self.silence and not dry:
             wait_for = say(self.tts_path)
             time.sleep(wait_for)
             bell()
         while self.stopwatch > 0:
-            print(f"{number}/{length} : {self}")
+            progression = f"{prefix} : {self}"
+            if pbar:
+                pbar.update(progression=progression)
+
+            if not pbar or dry:
+                print(progression)
             self.stopwatch -= 1
 
             if not dry:
@@ -61,7 +66,12 @@ class Exercice:
 
 
 @attr.s(auto_attribs=True, hash=True, repr=False)
-class Waiting(Exercice):
+class Exercice(BaseExercice):
+    color: str = "yellow"
+
+
+@attr.s(auto_attribs=True, hash=True, repr=False)
+class Waiting(BaseExercice):
     color: str = "bright_blue"
 
 

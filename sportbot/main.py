@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import logging
 import click
+import progressbar  # type: ignore
 from gtts import gTTS  # type: ignore
 from click_skeleton import skeleton, doc, backtrace, ExpandedPath
 from sportbot import version
@@ -20,6 +21,7 @@ dry_option = click.option('--dry', is_flag=True)
 @skeleton(name=PROG_NAME, version=version.__version__, auto_envvar_prefix='SP')
 def cli():
     """SportBot."""
+    progressbar.streams.wrap(stderr=True, stdout=True)
 
 
 @cli.command(help='Create custom rounds')

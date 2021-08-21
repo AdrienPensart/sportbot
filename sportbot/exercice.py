@@ -1,4 +1,4 @@
-from typing import FrozenSet
+from typing import FrozenSet, Set
 import time
 import os
 import click
@@ -14,7 +14,17 @@ def default_tts_path(name):
     return f'{dir_path}/tts/{name}.mp3'
 
 
-known_exercices = set()
+_known_exercices = set()
+
+
+class classproperty:
+    __slots__ = ('getter', )
+
+    def __init__(self, getter):
+        self.getter = getter
+
+    def __get__(self, obj, cls):
+        return self.getter(cls, obj)
 
 
 @attr.s(auto_attribs=True, hash=True, repr=False)
@@ -29,12 +39,20 @@ class BaseExercice:
     def __attrs_post_init__(self) -> None:
         self.stopwatch = self.duration
         if not isinstance(self, Waiting):
-            known_exercices.add(self)
+            _known_exercices.add(self)
 
     def __repr__(self):
         if self.stopwatch != self.duration:
             return click.style(f"{self.name} : {self.stopwatch} / {self.duration} seconds", fg=self.color)
         return click.style(f"{self.name} : {self.stopwatch} seconds ", fg=self.color)
+
+    @classproperty
+    def known_tags(cls, obj) -> Set[str]:  # pylint: disable=no-self-argument,no-self-use,unused-argument
+        return set().union(*[exercice.tags for exercice in cls.known_exercices])  # type: ignore
+
+    @classproperty
+    def known_exercices(cls, obj) -> Set:  # pylint: disable=no-self-argument,no-self-use,unused-argument
+        return _known_exercices
 
     @property
     def tts_path(self) -> str:

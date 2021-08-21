@@ -6,7 +6,7 @@ from gtts import gTTS  # type: ignore
 from click_skeleton import skeleton, doc, backtrace, ExpandedPath
 from sportbot import version
 from sportbot.sequence import Sequence
-from sportbot.exercice import known_exercices, Rest, Waiting, Boxing
+from sportbot.exercice import Exercice, Rest, Waiting, Boxing
 from sportbot.boxing import boxing_training  # type: ignore
 from sportbot.helpers import rounds, flatten, Py2Key
 
@@ -61,18 +61,15 @@ def _sequences(tags: str):
 @cli.command('exercices', help='List available exercices')
 @click.option('--tag', 'tags', help="Tag filter", multiple=True)
 def _exercices(tags: str):
-    for exercice in sorted(known_exercices, key=Py2Key):
-        if tags:
-            for tag in tags:
-                if tag not in exercice.tags:
-                    print(exercice)
-        else:
-            print(exercice)
+    for exercice in sorted(Exercice.known_exercices, key=Py2Key):
+        if tags and not any(tag in exercice.tags for tag in tags):
+            continue
+        print(exercice)
 
 
 @cli.command(help='List available tags')
 def tags():
-    for tag in boxing_training.tags:
+    for tag in Exercice.known_tags:  # pylint: disable=not-an-iterable
         print(tag)
 
 

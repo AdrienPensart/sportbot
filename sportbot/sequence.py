@@ -1,19 +1,31 @@
-from typing import FrozenSet, Optional, List
+from typing import Tuple, Dict, Set, FrozenSet, Optional
+import functools
 import click
 import attr
 import progressbar  # type: ignore
-from sportbot.helpers import seconds_to_human
-from sportbot.sound import bell
+from sportbot.helpers import seconds_to_human, classproperty
+from sportbot.sound import Bell
 from sportbot.exercice import Exercice, Waiting
 from sportbot.rest import Rest
 
 
-@attr.s(auto_attribs=True, repr=False)
+@attr.s(auto_attribs=True, repr=False, hash=True)
 class Sequence:
     name: str
-    exercices: List[Exercice]
+    exercices: Tuple[Exercice]
     description: Optional[str] = None
     tags: FrozenSet[str] = attr.ib(default=frozenset(), converter=frozenset)
+
+    def __attrs_post_init__(self) -> None:
+        known_sequences[self.name] = self
+
+    @functools.cached_property
+    def bell(self):
+        return Bell()
+
+    @classproperty
+    def known_tags(cls, obj) -> Set[str]:  # pylint: disable=no-self-argument,no-self-use,unused-argument
+        return set().union(*[sequence.tags for sequence in known_sequences.values()])  # type: ignore # pylint: disable=not-an-iterable
 
     def run(self, dry=False):
         number = 0
@@ -27,8 +39,7 @@ class Sequence:
                 exercice.run(prefix=prefix, dry=dry, pbar=pbar)
                 pbar.update(number)
 
-        if not dry:
-            bell()
+        self.bell.say(dry)
 
     def __repr__(self):
         joined_tags = ' '.join(self.tags)
@@ -82,3 +93,6 @@ class Sequence:
     @property
     def human_left_stopwatch(self) -> str:
         return seconds_to_human(self.left_stopwatch)
+
+
+known_sequences: Dict[str, Sequence] = {}

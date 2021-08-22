@@ -3,13 +3,14 @@ import sys
 import logging
 import click
 import progressbar  # type: ignore
-from gtts import gTTS  # type: ignore
-from click_skeleton import skeleton, doc, backtrace, ExpandedPath
+from click_skeleton import skeleton, doc, backtrace
 from sportbot import version
-from sportbot.sequence import Sequence
-from sportbot.exercice import Exercice, Waiting
+from sportbot.sound import Sound
+from sportbot.training import known_trainings
+from sportbot.sequence import known_sequences, Sequence
+from sportbot.exercice import known_exercices, Exercice, Prepare, TheEnd
+from sportbot.boxing import Boxing  # type: ignore
 from sportbot.rest import Rest
-from sportbot.boxing import Boxing, boxing_training  # type: ignore
 from sportbot.helpers import create_rounds, flatten, Py2Key
 
 PROG_NAME = "sportbot"
@@ -33,14 +34,15 @@ def cli():
 @click.option('--rounds', type=int, default=12)
 @click.option('--duration', type=int, default=120)
 @click.option('--prepare', type=int, default=10)
+@click.option('--end', type=int, default=5)
 @click.option('--rest', type=int, default=60)
-def boxing(name, prepare, duration, rest, dry, rounds):
+def boxing(name, prepare, duration, rest, dry, end, rounds):
     _round = Boxing("Boxing", duration=duration)
     _rest = Rest(duration=rest)
     all_rounds = flatten(
-        Waiting("Prepare", duration=prepare),
+        Prepare(duration=prepare),
         create_rounds(n=rounds, exercice=_round, rest=_rest),
-        Waiting("The End", duration=5),
+        TheEnd(duration=end),
     )
     sequence = Sequence(
         name=name,
@@ -53,7 +55,7 @@ def boxing(name, prepare, duration, rest, dry, rounds):
 @cli.command('sequences', help='List available sequences')
 @click.option('--tag', 'tags', help="Tag filter", multiple=True)
 def _sequences(tags: str):
-    for sequence in boxing_training.sequences:
+    for sequence in known_sequences.values():
         if tags and not any(tag in sequence.tags for tag in tags):
             continue
         print(sequence)
@@ -61,10 +63,19 @@ def _sequences(tags: str):
             print(f"   {exercice}")
 
 
+@cli.command('trainings', help='List available exercices')
+@click.option('--tag', 'tags', help="Tag filter", multiple=True)
+def _trainings(tags: str):
+    for training in sorted(known_trainings.values(), key=Py2Key):
+        if tags and not any(tag in training.tags for tag in tags):
+            continue
+        print(training)
+
+
 @cli.command('exercices', help='List available exercices')
 @click.option('--tag', 'tags', help="Tag filter", multiple=True)
 def _exercices(tags: str):
-    for exercice in sorted(Exercice.known_exercices, key=Py2Key):
+    for exercice in sorted(known_exercices.values(), key=Py2Key):
         if tags and not any(tag in exercice.tags for tag in tags):
             continue
         print(exercice)
@@ -79,28 +90,53 @@ def tags():
 @cli.command(help='Generate sound')
 @click.argument("name")
 @dry_option
+@click.option('--force', help="Recreate sound if already exists", is_flag=True)
 @click.option(
     "--path",
     help="Sound output path",
-    type=ExpandedPath(exists=True, dir_okay=True, file_okay=False),
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
     default='.',
     show_default=True,
 )
-def generate_sound(name, dry, path):
-    tts = gTTS(name)
-    if not dry:
-        tts.save(path)
+def generate_sound(name, dry, path, force):
+    sound = Sound(name, directory=path)
+    sound.create(dry=dry, force=force)
 
 
 @cli.command(help='Start sequence')
 @click.argument('name')
 @dry_option
-def start(name, dry):
-    for sequence in boxing_training.sequences:
-        if name == sequence.name:
-            sequence.run(dry)
-            return
-    print("Unknown sequence")
+def start_sequence(name, dry):
+    sequence = known_sequences.get(name, None)
+    if not sequence:
+        print("Unknown sequence")
+        return
+
+    sequence.run(dry)
+
+
+@cli.command(help='Start training')
+@click.argument('name')
+@dry_option
+def start_training(name, dry):
+    training = known_trainings.get(name, None)
+    if not training:
+        print("Unknown training")
+        return
+
+    training.run(dry)
+
+
+@cli.command(help='Start exercice')
+@click.argument('name')
+@dry_option
+def start_exercice(name, dry):
+    exercice = known_exercices.get(name, None)
+    if not exercice:
+        print("Unknown exercice")
+        return
+
+    exercice.run(dry)
 
 
 @cli.command(short_help='Generates a README.rst', aliases=['doc'])

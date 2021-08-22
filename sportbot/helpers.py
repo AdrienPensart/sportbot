@@ -4,6 +4,16 @@ import copy
 import collections
 
 
+class classproperty:
+    __slots__ = ('getter', )
+
+    def __init__(self, getter):
+        self.getter = getter
+
+    def __get__(self, obj, cls):
+        return self.getter(cls, obj)
+
+
 class Py2Key:
     __slots__ = ("value", "typestr")
 

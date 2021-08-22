@@ -1,18 +1,35 @@
 # type: ignore
 # bug: https://github.com/python/mypy/issues/8625
 from typing import FrozenSet
+import functools
 import attr
 from sportbot.helpers import create_rounds, flatten
+from sportbot.sound import Sound
 from sportbot.sequence import Sequence
-from sportbot.sequences import Sequences
-from sportbot.exercice import Exercice, prepare, the_end
+from sportbot.training import Training
+from sportbot.exercice import Exercice, Prepare, TheEnd
 from sportbot.rest import _1_minute_rest
 
 
-@attr.s(auto_attribs=True, hash=True, repr=False)
+@attr.s(auto_attribs=True, repr=False)
 class Boxing(Exercice):
     color: str = "red"
     tags: FrozenSet[str] = frozenset({"boxing"})
+
+    @functools.cached_property
+    def sound(self):
+        return Sound(self.name, directory='/tmp')
+
+
+@attr.s(auto_attribs=True, repr=False)
+class BoxingSequence(Sequence):
+    tags: FrozenSet[str] = frozenset({"boxing"})
+
+
+@attr.s(auto_attribs=True, repr=False)
+class BoxingTraining(Training):
+    name: str = "boxing-training"
+    description: str = "Boxing Training"
 
 
 # Kicks
@@ -35,25 +52,25 @@ _3_minutes_shadow_boxing = Boxing("Shadow boxing", duration=180)
 _2_minutes_double_ended_bag_boxing = Boxing("Double-ended bag boxing", duration=120)
 _3_minutes_double_ended_bag_boxing = Boxing("Double-ended bag boxing", duration=180)
 
-boxing_training = Sequences([
-    Sequence(
-        name="12_rounds_2_minutes_shadow_boxing",
-        description="12 rounds of 2 minutes shadow boxing with 1 minute rest in between",
-        exercices=flatten(
-            prepare,
-            create_rounds(12, _2_minutes_shadow_boxing, _1_minute_rest),
-            the_end,
+boxing_training = BoxingTraining(
+    sequences=tuple([
+        BoxingSequence(
+            name="12-rounds-2-minutes-shadow-boxing",
+            description="12 rounds of 2 minutes shadow boxing with 1 minute rest in between",
+            exercices=flatten(
+                Prepare(),
+                create_rounds(1, _2_minutes_shadow_boxing, _1_minute_rest),
+                TheEnd(),
+            ),
         ),
-        tags={"boxing"},
-    ),
-    Sequence(
-        name="12_double_ended_bag_boxing_rounds_2_minutes",
-        description="12 rounds of 2 minutes double ended bag with 1 minute rest in between",
-        exercices=flatten(
-            prepare,
-            create_rounds(12, _2_minutes_double_ended_bag_boxing, _1_minute_rest),
-            the_end,
+        BoxingSequence(
+            name="12-double-ended-bag-boxing-rounds-2-minutes",
+            description="12 rounds of 2 minutes double ended bag with 1 minute rest in between",
+            exercices=flatten(
+                Prepare(),
+                create_rounds(1, _2_minutes_double_ended_bag_boxing, _1_minute_rest),
+                TheEnd(),
+            ),
         ),
-        tags={"boxing"},
-    ),
-])
+    ]),
+)

@@ -1,11 +1,12 @@
 from typing import Tuple, Dict, Set, FrozenSet, Optional
+import copy
 import functools
 import click
 import attr
 import progressbar  # type: ignore
-from sportbot.helpers import seconds_to_human, classproperty
+from sportbot.helpers import flatten, intersperse, seconds_to_human, classproperty
 from sportbot.sound import Bell
-from sportbot.exercice import Exercice, Waiting
+from sportbot.exercice import Exercice, Waiting, rhythmic_push_up, maintain
 from sportbot.rest import Rest
 
 
@@ -15,9 +16,19 @@ class Sequence:
     exercices: Tuple[Exercice]
     description: Optional[str] = None
     tags: FrozenSet[str] = attr.ib(default=frozenset(), converter=frozenset)
+    register: bool = True
 
     def __attrs_post_init__(self) -> None:
-        known_sequences[self.name] = self
+        if self.register:
+            known_sequences[self.name] = self
+
+    @staticmethod
+    def rounds(n, exercice, rest):
+        name = f"{n}_{exercice.name}"
+        description = f"{n} {exercice.name} ({rest})"
+        exercices = flatten(intersperse([copy.deepcopy(exercice) for _ in range(n)], rest))
+        sequence = Sequence(name=name, description=description, exercices=exercices, register=False)
+        return sequence
 
     @functools.cached_property
     def bell(self):
@@ -42,12 +53,14 @@ class Sequence:
         self.bell.say(dry)
 
     def __repr__(self):
-        joined_tags = ' '.join(self.tags)
         if self.description:
             representation = self.description
         else:
             representation = self.name
-        representation += f" ({joined_tags}), {self.length} exercices, duration: {self.human_exercices_duration}, rest: {self.human_rest_duration}, total duration: {self.human_total_duration}"
+        joined_tags = ' '.join(self.tags)
+        if joined_tags:
+            representation += f" ({joined_tags}),"
+        representation += f" {self.length} exercices, duration: {self.human_exercices_duration}, rest: {self.human_rest_duration}, total duration: {self.human_total_duration}"
         return click.style(representation, fg="magenta")
 
     @property
@@ -96,3 +109,5 @@ class Sequence:
 
 
 known_sequences: Dict[str, Sequence] = {}
+
+_10_rhythmic_push_up = Sequence.rounds(10, rhythmic_push_up, maintain)

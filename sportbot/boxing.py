@@ -3,7 +3,7 @@
 from typing import FrozenSet
 import functools
 import attr
-from sportbot.helpers import create_rounds, flatten
+from sportbot.helpers import flatten
 from sportbot.sound import Sound
 from sportbot.sequence import Sequence
 from sportbot.training import Training
@@ -59,7 +59,7 @@ boxing_training = BoxingTraining(
             description="12 rounds of 2 minutes shadow boxing with 1 minute rest in between",
             exercices=flatten(
                 Prepare(),
-                create_rounds(1, _2_minutes_shadow_boxing, _1_minute_rest),
+                Sequence.rounds(12, _2_minutes_shadow_boxing, _1_minute_rest).exercices,
                 TheEnd(),
             ),
         ),
@@ -68,7 +68,7 @@ boxing_training = BoxingTraining(
             description="12 rounds of 2 minutes double ended bag with 1 minute rest in between",
             exercices=flatten(
                 Prepare(),
-                create_rounds(1, _2_minutes_double_ended_bag_boxing, _1_minute_rest),
+                Sequence.rounds(12, _2_minutes_double_ended_bag_boxing, _1_minute_rest).exercices,
                 TheEnd(),
             ),
         ),

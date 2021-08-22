@@ -7,9 +7,11 @@ from sportbot.sequence import Sequence
 class Training:
     name: str
     sequences: Tuple[Sequence]
+    register: bool = True
 
     def __attrs_post_init__(self) -> None:
-        known_trainings[self.name] = self
+        if self.register:
+            known_trainings[self.name] = self
 
     @property
     def tags(self):

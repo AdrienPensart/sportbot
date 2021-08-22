@@ -11,7 +11,7 @@ from sportbot.sequence import known_sequences, Sequence
 from sportbot.exercice import known_exercices, Exercice, Prepare, TheEnd
 from sportbot.boxing import Boxing  # type: ignore
 from sportbot.rest import Rest
-from sportbot.helpers import create_rounds, flatten, Py2Key
+from sportbot.helpers import flatten, Py2Key
 
 PROG_NAME = "sportbot"
 logger = logging.getLogger(__name__)
@@ -42,16 +42,17 @@ def boxing():
 @click.option('--end', type=int, default=5)
 @click.option('--rest', type=int, default=60)
 def boxing_rounds(name, prepare, duration, rest, dry, end, rounds):
-    _round = Boxing("Boxing", duration=duration)
-    _rest = Rest(duration=rest)
-    all_rounds = flatten(
-        Prepare(duration=prepare),
-        create_rounds(n=rounds, exercice=_round, rest=_rest),
-        TheEnd(duration=end),
-    )
     sequence = Sequence(
         name=name,
-        exercices=all_rounds,
+        exercices=flatten(
+            Prepare(duration=prepare),
+            Sequence.rounds(
+                n=rounds,
+                exercice=Boxing("Boxing", duration=duration),
+                rest=Rest(duration=rest)
+            ).exercices,
+            TheEnd(duration=end),
+        ),
         tags={"boxing"},
     )
     sequence.run(dry)

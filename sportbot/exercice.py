@@ -4,7 +4,7 @@ import time
 import click
 import attr
 from sportbot.sound import player, Sound, Bell
-from sportbot.helpers import classproperty, create_rounds
+from sportbot.helpers import classproperty
 
 
 @attr.s(auto_attribs=True, hash=True, repr=False)
@@ -15,16 +15,17 @@ class BaseExercice:
     silence: bool = False
     stopwatch: int = 0
     tags: FrozenSet[str] = attr.ib(default=frozenset(), converter=frozenset)
+    register: bool = True
 
     def __attrs_post_init__(self) -> None:
         self.stopwatch = self.duration
-        if not isinstance(self, Waiting):
+        if self.register and not isinstance(self, Waiting):
             known_exercices[self.name] = self
 
     def __repr__(self):
         if self.stopwatch != self.duration:
             return click.style(f"{self.name} : {self.stopwatch} / {self.duration} seconds", fg=self.color)
-        return click.style(f"{self.name} : {self.stopwatch} seconds ", fg=self.color)
+        return click.style(f"{self.name} : {self.stopwatch} seconds", fg=self.color)
 
     @functools.cached_property
     def bell(self):
@@ -142,4 +143,3 @@ _60_seconds_burpees = exercice("Burpees", duration=60, tags={'strengthening'})
 # Push-ups
 _10_push_up = exercice("10 push-ups", duration=60, tags={'warming-up', 'strengthening'})
 rhythmic_push_up = exercice("Push-up", duration=2, tags={'strengthening'})
-_10_rhythmic_push_up = create_rounds(10, rhythmic_push_up, maintain)

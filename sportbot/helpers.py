@@ -67,7 +67,3 @@ def join_exercices(iterable, rest):
 
 def intersperse(exercices, rest):
     return list(join_exercices(exercices, rest))
-
-
-def create_rounds(n, exercice, rest):
-    return flatten(intersperse([copy.deepcopy(exercice) for _ in range(n)], rest))

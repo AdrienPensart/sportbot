@@ -93,14 +93,5 @@ class Waiting(BaseExercice):
     color: str = "bright_blue"
 
 
-@attr.s(auto_attribs=True, hash=True, repr=False)
-class Rest(Waiting):
-    name: str = attr.ib(default="Rest")
-    color: str = "green"
-    tags: FrozenSet[str] = frozenset({"rest"})
-
-
-@attr.s(auto_attribs=True, hash=True, repr=False)
-class Boxing(Exercice):
-    color: str = "red"
-    tags: FrozenSet[str] = frozenset({"boxing"})
+prepare = Waiting("Prepare", duration=20)
+the_end = Waiting("THE END", duration=5)

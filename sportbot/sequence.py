@@ -4,7 +4,8 @@ import attr
 import progressbar  # type: ignore
 from sportbot.helpers import seconds_to_human
 from sportbot.sound import bell
-from sportbot.exercice import Exercice, Rest, Waiting
+from sportbot.exercice import Exercice, Waiting
+from sportbot.rest import Rest
 
 
 @attr.s(auto_attribs=True, repr=False)

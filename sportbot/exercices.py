@@ -1,18 +1,9 @@
 # type: ignore
 # bug: https://github.com/python/mypy/issues/8625
-from sportbot.helpers import rounds
-from sportbot.exercice import Exercice, Rest, Waiting, Boxing
+from sportbot.helpers import create_rounds
+from sportbot.exercice import Exercice
 
-prepare = Waiting("Prepare", duration=20)
-the_end = Waiting("THE END", duration=5)
 maintain = Exercice("Maintain", duration=1, silence=True)
-
-# RESTS
-_15_seconds_rest = Rest(duration=15)
-_30_seconds_rest = Rest(duration=30)
-_45_seconds_rest = Rest(duration=45)
-_60_seconds_rest = _1_minute_rest = Rest(duration=60)
-_120_seconds_rest = _2_minutes_rest = Rest(duration=120)
 
 # SIMPLE
 
@@ -68,24 +59,4 @@ _60_seconds_burpees = Exercice("Burpees", duration=60, tags={'strengthening'})
 # Push-ups
 _10_push_up = Exercice("10 push-ups", duration=60, tags={'warming-up', 'strengthening'})
 rhythmic_push_up = Exercice("Push-up", duration=2, tags={'strengthening'})
-_10_rhythmic_push_up = rounds(10, rhythmic_push_up, maintain)
-
-# Kicks
-_30_seconds_jab_cross = Boxing("Jab/Cross", duration=30)
-_60_seconds_jab_cross = _1_minute_jab_cross = Boxing("Jab/Cross", duration=60)
-
-_30_seconds_uppercuts = Boxing("Left/right uppercuts", duration=30)
-_60_seconds_uppercuts = _1_minute_uppercuts = Boxing("Left/right uppercuts", duration=60)
-
-_30_seconds_hooks = Boxing("Left/right hooks", duration=30)
-_60_seconds_hooks = _1_minute_hooks = Boxing("Left/right hooks", duration=60)
-
-_30_seconds_knee_kicks = Boxing("Knee kicks", duration=30)
-_60_seconds_knee_kicks = _1_minute_knee_kicks = Boxing("Knee kicks", duration=60)
-
-# Boxing
-_2_minutes_shadow_boxing = Boxing("Shadow boxing", duration=120)
-_3_minutes_shadow_boxing = Boxing("Shadow boxing", duration=180)
-
-_2_minutes_double_ended_bag_boxing = Boxing("Double-ended bag boxing", duration=120)
-_3_minutes_double_ended_bag_boxing = Boxing("Double-ended bag boxing", duration=180)
+_10_rhythmic_push_up = create_rounds(10, rhythmic_push_up, maintain)

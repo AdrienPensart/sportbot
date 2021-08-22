@@ -26,7 +26,7 @@ def seconds_to_human(seconds: int) -> str:
 def deep_flatten(iterables):
     '''Recursively flatten argument'''
     for element in iterables:
-        if isinstance(element, collections.Iterable) and not isinstance(element, (str, bytes)):
+        if isinstance(element, collections.abc.Iterable) and not isinstance(element, (str, bytes)):
             yield from deep_flatten(element)
         else:
             yield element
@@ -59,5 +59,5 @@ def intersperse(exercices, rest):
     return list(join_exercices(exercices, rest))
 
 
-def rounds(n, exercice, rest):
+def create_rounds(n, exercice, rest):
     return flatten(intersperse([copy.deepcopy(exercice) for _ in range(n)], rest))

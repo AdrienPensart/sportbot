@@ -1,4 +1,4 @@
-atomicwrites==1.4.0; python_version >= "3.6" and python_full_version < "3.0.0" and python_version <= "3.9" and sys_platform == "win32" or python_version >= "3.6" and python_version <= "3.9" and sys_platform == "win32" and python_full_version >= "3.4.0"
+atomicwrites==1.4.0; python_version >= "3.6" and python_full_version < "3.0.0" and sys_platform == "win32" and python_version <= "3.9" or sys_platform == "win32" and python_version >= "3.6" and python_version <= "3.9" and python_full_version >= "3.4.0"
 attrs==21.2.0; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
 certifi==2021.5.30; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "2.7"
 charset-normalizer==2.0.4; python_full_version >= "3.6.0" and python_version >= "3"
@@ -9,7 +9,7 @@ click-help-colors==0.9.1; python_version >= "3.6" and python_version <= "3.9"
 click-option-group==0.5.3; python_version >= "3.6" and python_version <= "3.9"
 click-skeleton==0.15; python_version >= "3.6" and python_version <= "3.9"
 click==8.0.1; python_version >= "3.6" and python_version <= "3.9"
-colorama==0.4.4; python_version >= "3.6" and python_full_version < "3.0.0" and python_version <= "3.9" and platform_system == "Windows" and sys_platform == "win32" or python_version >= "3.6" and python_version <= "3.9" and python_full_version >= "3.5.0" and platform_system == "Windows" and sys_platform == "win32"
+colorama==0.4.4; python_version >= "3.6" and python_full_version < "3.0.0" and python_version <= "3.9" and sys_platform == "win32" and platform_system == "Windows" or python_version >= "3.6" and python_version <= "3.9" and python_full_version >= "3.5.0" and sys_platform == "win32" and platform_system == "Windows"
 gtts==2.2.3; python_version >= "2.7"
 idna==3.2; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.5"
 importlib-metadata==4.6.4; python_version < "3.8" and python_version >= "3.6" and (python_version >= "3.6" and python_full_version < "3.0.0" and python_version < "3.8" or python_version >= "3.6" and python_version < "3.8" and python_full_version >= "3.4.0")
@@ -23,7 +23,7 @@ progressbar2==3.53.1
 py==1.10.0; python_version >= "3.6" and python_full_version < "3.0.0" and python_version <= "3.9" or python_version >= "3.6" and python_version <= "3.9" and python_full_version >= "3.4.0"
 pyparsing==2.4.7; python_version >= "3.6" and python_full_version < "3.0.0" and python_version <= "3.9" or python_version >= "3.6" and python_version <= "3.9" and python_full_version >= "3.3.0"
 pytest-click==1.0.2; python_version >= "3.6" and python_version <= "3.9"
-pytest==6.2.4; python_version >= "3.6" and python_version <= "3.9"
+pytest==6.2.4; python_version >= "3.6"
 python-slugify==5.0.2; python_version >= "3.6"
 python-utils==2.5.6
 python-vlc==3.0.12118

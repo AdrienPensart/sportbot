@@ -3,7 +3,7 @@ import sys
 import logging
 import click
 import progressbar  # type: ignore
-from click_skeleton import skeleton, doc, backtrace
+from click_skeleton import skeleton, doc, backtrace, AdvancedGroup
 from sportbot import version
 from sportbot.sound import Sound
 from sportbot.training import known_trainings
@@ -28,7 +28,12 @@ def cli():
         progressbar.streams.wrap(stderr=True, stdout=True)
 
 
-@cli.command(help='Create custom rounds')
+@cli.group(help='Boxing Training', cls=AdvancedGroup)
+def boxing():
+    pass
+
+
+@boxing.command('rounds', help='Create custom rounds')
 @dry_option
 @click.option('--name', default="Rounds")
 @click.option('--rounds', type=int, default=12)
@@ -36,7 +41,7 @@ def cli():
 @click.option('--prepare', type=int, default=10)
 @click.option('--end', type=int, default=5)
 @click.option('--rest', type=int, default=60)
-def boxing(name, prepare, duration, rest, dry, end, rounds):
+def boxing_rounds(name, prepare, duration, rest, dry, end, rounds):
     _round = Boxing("Boxing", duration=duration)
     _rest = Rest(duration=rest)
     all_rounds = flatten(
@@ -52,9 +57,14 @@ def boxing(name, prepare, duration, rest, dry, end, rounds):
     sequence.run(dry)
 
 
-@cli.command('sequences', help='List available sequences')
+@cli.group(help='Sequence Tool', cls=AdvancedGroup)
+def sequence():
+    pass
+
+
+@sequence.command('list', help='List available sequences')
 @click.option('--tag', 'tags', help="Tag filter", multiple=True)
-def _sequences(tags: str):
+def sequence_list(tags: str):
     for sequence in known_sequences.values():
         if tags and not any(tag in sequence.tags for tag in tags):
             continue
@@ -63,28 +73,74 @@ def _sequences(tags: str):
             print(f"   {exercice}")
 
 
-@cli.command('trainings', help='List available exercices')
+@sequence.command('start', help='Start sequence')
+@click.argument('name')
+@dry_option
+def sequence_start(name, dry):
+    sequence = known_sequences.get(name, None)
+    if not sequence:
+        print("Unknown sequence")
+        return
+
+    sequence.run(dry)
+
+
+@cli.group(help='Training Tool', cls=AdvancedGroup)
+def training():
+    pass
+
+
+@training.command('list', help='List available trainings')
 @click.option('--tag', 'tags', help="Tag filter", multiple=True)
-def _trainings(tags: str):
+def training_list(tags: str):
     for training in sorted(known_trainings.values(), key=Py2Key):
         if tags and not any(tag in training.tags for tag in tags):
             continue
         print(training)
 
 
-@cli.command('exercices', help='List available exercices')
+@training.command('start', help='Start training')
+@click.argument('name')
+@dry_option
+def training_start(name, dry):
+    training = known_trainings.get(name, None)
+    if not training:
+        print("Unknown training")
+        return
+
+    training.run(dry)
+
+
+@cli.group(help='Exercice Tool', cls=AdvancedGroup)
+def exercice():
+    pass
+
+
+@exercice.command('list', help='List available exercices')
 @click.option('--tag', 'tags', help="Tag filter", multiple=True)
-def _exercices(tags: str):
+def exercice_list(tags: str):
     for exercice in sorted(known_exercices.values(), key=Py2Key):
         if tags and not any(tag in exercice.tags for tag in tags):
             continue
         print(exercice)
 
 
-@cli.command(help='List available tags')
-def tags():
+@exercice.command('tags', help='List available tags')
+def exercice_tags():
     for tag in Exercice.known_tags:  # pylint: disable=not-an-iterable
         print(tag)
+
+
+@exercice.command('start', help='Start exercice')
+@click.argument('name')
+@dry_option
+def exercice_start(name, dry):
+    exercice = known_exercices.get(name, None)
+    if not exercice:
+        print("Unknown exercice")
+        return
+
+    exercice.run(dry)
 
 
 @cli.command(help='Generate sound')
@@ -101,42 +157,6 @@ def tags():
 def generate_sound(name, dry, path, force):
     sound = Sound(name, directory=path)
     sound.create(dry=dry, force=force)
-
-
-@cli.command(help='Start sequence')
-@click.argument('name')
-@dry_option
-def start_sequence(name, dry):
-    sequence = known_sequences.get(name, None)
-    if not sequence:
-        print("Unknown sequence")
-        return
-
-    sequence.run(dry)
-
-
-@cli.command(help='Start training')
-@click.argument('name')
-@dry_option
-def start_training(name, dry):
-    training = known_trainings.get(name, None)
-    if not training:
-        print("Unknown training")
-        return
-
-    training.run(dry)
-
-
-@cli.command(help='Start exercice')
-@click.argument('name')
-@dry_option
-def start_exercice(name, dry):
-    exercice = known_exercices.get(name, None)
-    if not exercice:
-        print("Unknown exercice")
-        return
-
-    exercice.run(dry)
 
 
 @cli.command(short_help='Generates a README.rst', aliases=['doc'])

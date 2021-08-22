@@ -73,57 +73,65 @@ def test_cli_completion_show(cli_runner):
 
 
 @pytest.mark.runner_setup(mix_stderr=False)
-def test_cli_trainings(cli_runner):
+def test_cli_boxing_rounds(cli_runner):
     run_cli(cli_runner, cli, [
-        'trainings',
+        'boxing', 'rounds',
+        '--dry',
     ])
 
 
 @pytest.mark.runner_setup(mix_stderr=False)
-def test_cli_start_training(cli_runner):
+def test_cli_trainings_list(cli_runner):
     run_cli(cli_runner, cli, [
-        'start-training',
+        'training', 'list',
+    ])
+
+
+@pytest.mark.runner_setup(mix_stderr=False)
+def test_cli_training_start(cli_runner):
+    run_cli(cli_runner, cli, [
+        'training', 'start',
         'boxing-training',
         '--dry',
     ])
 
 
 @pytest.mark.runner_setup(mix_stderr=False)
-def test_cli_sequences(cli_runner):
+def test_cli_sequences_list(cli_runner):
     run_cli(cli_runner, cli, [
-        'sequences',
+        'sequence', 'list',
     ])
 
 
 @pytest.mark.runner_setup(mix_stderr=False)
-def test_cli_start_sequence(cli_runner):
+def test_cli_sequence_start(cli_runner):
     run_cli(cli_runner, cli, [
-        'start-sequence',
+        'sequence', 'start',
         '12-rounds-2-minutes-shadow-boxing',
         '--dry',
     ])
 
 
 @pytest.mark.runner_setup(mix_stderr=False)
-def test_cli_exercices(cli_runner):
+def test_cli_exercices_list(cli_runner):
     run_cli(cli_runner, cli, [
-        'exercices',
+        'exercice', 'list',
     ])
 
 
 @pytest.mark.runner_setup(mix_stderr=False)
-def test_cli_start_exercice(cli_runner):
+def test_cli_exercice_start(cli_runner):
     run_cli(cli_runner, cli, [
-        'start-exercice',
+        'exercice', 'start',
         'prepare',
         '--dry',
     ])
 
 
 @pytest.mark.runner_setup(mix_stderr=False)
-def test_cli_tags(cli_runner):
+def test_cli_exercice_tags(cli_runner):
     run_cli(cli_runner, cli, [
-        'tags',
+        'exercice', 'tags',
     ])
 
 
@@ -134,12 +142,4 @@ def test_cli_generate_sound(cli_runner):
         'test',
         '--path', '/tmp/',
         '--force',
-    ])
-
-
-@pytest.mark.runner_setup(mix_stderr=False)
-def test_cli_boxing(cli_runner):
-    run_cli(cli_runner, cli, [
-        'boxing',
-        '--dry',
     ])

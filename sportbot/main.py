@@ -71,7 +71,7 @@ def sequence_list(tags: str):
             continue
         print(sequence)
         for exercice in sequence.exercices:
-            print(f"   {exercice}")
+            print(f"\t{exercice}")
 
 
 @sequence.command('start', help='Start sequence')
@@ -98,6 +98,12 @@ def training_list(tags: str):
         if tags and not any(tag in training.tags for tag in tags):
             continue
         print(training)
+        for sequence in training.sequences:
+            if tags and not any(tag in sequence.tags for tag in tags):
+                continue
+            print(f"\t{sequence}")
+            for exercice in sequence.exercices:
+                print(f"\t\t{exercice}")
 
 
 @training.command('start', help='Start training')

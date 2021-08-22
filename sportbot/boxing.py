@@ -5,9 +5,9 @@ import functools
 import attr
 from sportbot.helpers import flatten
 from sportbot.sound import Sound
-from sportbot.sequence import Sequence
+from sportbot.sequence import Sequence, RestSequence, TheEndSequence
 from sportbot.training import Training
-from sportbot.exercice import Exercice, Prepare, TheEnd
+from sportbot.exercice import Exercice, Prepare
 from sportbot.rest import _1_minute_rest
 
 
@@ -60,17 +60,17 @@ boxing_training = BoxingTraining(
             exercices=flatten(
                 Prepare(),
                 Sequence.rounds(12, _2_minutes_shadow_boxing, _1_minute_rest).exercices,
-                TheEnd(),
             ),
         ),
+        RestSequence(),
         BoxingSequence(
             name="12-double-ended-bag-boxing-rounds-2-minutes",
             description="12 rounds of 2 minutes double ended bag with 1 minute rest in between",
             exercices=flatten(
                 Prepare(),
                 Sequence.rounds(12, _2_minutes_double_ended_bag_boxing, _1_minute_rest).exercices,
-                TheEnd(),
             ),
         ),
+        TheEndSequence(),
     ]),
 )

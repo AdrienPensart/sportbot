@@ -6,14 +6,14 @@ import attr
 import progressbar  # type: ignore
 from sportbot.helpers import flatten, intersperse, seconds_to_human, classproperty
 from sportbot.sound import Bell
-from sportbot.exercice import Exercice, Waiting, rhythmic_push_up, maintain
-from sportbot.rest import Rest
+from sportbot.exercice import BaseExercice, Exercice, Prepare, TheEnd, Waiting, rhythmic_push_up, maintain
+from sportbot.rest import Rest, _5_minutes_rest
 
 
 @attr.s(auto_attribs=True, repr=False, hash=True)
 class Sequence:
     name: str
-    exercices: Tuple[Exercice]
+    exercices: Tuple[BaseExercice, ...]
     description: Optional[str] = None
     tags: FrozenSet[str] = attr.ib(default=frozenset(), converter=frozenset)
     register: bool = True
@@ -101,11 +101,35 @@ class Sequence:
 
     @property
     def left_stopwatch(self) -> int:
-        return sum([exercice.stopwatch for exercice in self.exercices if type(exercice) != Waiting])  # pylint: disable=unidiomatic-typecheck
+        return sum([exercice.stopwatch for exercice in self.exercices if not isinstance(exercice, Waiting)])
 
     @property
     def human_left_stopwatch(self) -> str:
         return seconds_to_human(self.left_stopwatch)
+
+
+@attr.s(auto_attribs=True, repr=False, hash=True)
+class PrepareSequence(Sequence):
+    name: str = "prepare-sequence"
+    description: str = "Prepare Sequence"
+    exercices: Tuple[BaseExercice, ...] = tuple([Prepare()])
+    register: bool = False
+
+
+@attr.s(auto_attribs=True, repr=False, hash=True)
+class RestSequence(Sequence):
+    name: str = "rest-sequence"
+    description: str = "Rest Sequence"
+    exercices: Tuple[BaseExercice, ...] = tuple([_5_minutes_rest])
+    register: bool = False
+
+
+@attr.s(auto_attribs=True, repr=False, hash=True)
+class TheEndSequence(Sequence):
+    name: str = "the-end-sequence"
+    description: str = "The End Sequence"
+    exercices: Tuple[BaseExercice, ...] = tuple([TheEnd()])
+    register: bool = False
 
 
 known_sequences: Dict[str, Sequence] = {}

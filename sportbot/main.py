@@ -7,7 +7,7 @@ from click_skeleton import skeleton, doc, backtrace, AdvancedGroup
 from sportbot import version
 from sportbot.sound import Sound
 from sportbot.training import known_trainings
-from sportbot.sequence import known_sequences, Sequence
+from sportbot.sequence import known_sequences, Sequence, create_sequence
 from sportbot.exercice import known_exercices, Exercice, Prepare, TheEnd
 from sportbot.boxing import Boxing  # type: ignore
 from sportbot.rest import Rest
@@ -41,21 +41,21 @@ def boxing():
 @click.option('--prepare', type=int, default=10)
 @click.option('--end', type=int, default=5)
 @click.option('--rest', type=int, default=60)
-def boxing_rounds(name, prepare, duration, rest, dry, end, rounds):
-    sequence = Sequence(
+def boxing_rounds(name: str, prepare: int, duration: int, rest: int, dry: bool, end: int, rounds: int):
+    create_sequence(
         name=name,
+        description='Boxing rounds',
         exercices=flatten(
             Prepare(duration=prepare),
             Sequence.rounds(
                 n=rounds,
                 exercice=Boxing("Boxing", duration=duration),
-                rest=Rest(duration=rest)
+                waiting=Rest(duration=rest)
             ).exercices,
             TheEnd(duration=end),
         ),
         tags={"boxing"},
-    )
-    sequence.run(dry)
+    ).run(dry)
 
 
 @cli.group(help='Sequence Tool', cls=AdvancedGroup)
@@ -77,7 +77,7 @@ def sequence_list(tags: str):
 @sequence.command('start', help='Start sequence')
 @click.argument('name')
 @dry_option
-def sequence_start(name, dry):
+def sequence_start(name: str, dry: bool):
     sequence = known_sequences.get(name, None)
     if not sequence:
         print("Unknown sequence")
@@ -109,7 +109,7 @@ def training_list(tags: str):
 @training.command('start', help='Start training')
 @click.argument('name')
 @dry_option
-def training_start(name, dry):
+def training_start(name: str, dry: bool):
     training = known_trainings.get(name, None)
     if not training:
         print("Unknown training")
@@ -141,13 +141,13 @@ def exercice_tags():
 @exercice.command('start', help='Start exercice')
 @click.argument('name')
 @dry_option
-def exercice_start(name, dry):
+def exercice_start(name: str, dry: bool):
     exercice = known_exercices.get(name, None)
     if not exercice:
         print("Unknown exercice")
         return
 
-    exercice.run(dry)
+    exercice.run(dry=dry)
 
 
 @cli.command(help='Generate sound')
@@ -161,7 +161,7 @@ def exercice_start(name, dry):
     default='.',
     show_default=True,
 )
-def generate_sound(name, dry, path, force):
+def generate_sound(name: str, dry: bool, path: str, force: bool):
     sound = Sound(name, directory=path)
     sound.create(dry=dry, force=force)
 
@@ -169,7 +169,7 @@ def generate_sound(name, dry, path, force):
 @cli.command(short_help='Generates a README.rst', aliases=['doc'])
 @click.pass_context
 @click.option('--output', help='README output format', type=click.Choice(['rst', 'markdown']), default='rst', show_default=True)
-def readme(ctx, output):
+def readme(ctx, output: str):
     '''Generates a complete readme'''
     doc.readme(cli, ctx.obj.prog_name, ctx.obj.context_settings, output)
 

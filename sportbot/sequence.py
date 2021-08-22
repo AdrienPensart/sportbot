@@ -3,10 +3,10 @@ import copy
 import functools
 import click
 import attr
-import progressbar  # type: ignore
+from progressbar import ProgressBar, Variable  # type: ignore
 from sportbot.helpers import flatten, intersperse, seconds_to_human, classproperty
 from sportbot.sound import Bell
-from sportbot.exercice import BaseExercice, Exercice, Prepare, TheEnd, Waiting, rhythmic_push_up, maintain
+from sportbot.exercice import BaseExercice, Exercice, Prepare, TheEnd, Maintain, Waiting, rhythmic_push_up
 from sportbot.rest import Rest, _5_minutes_rest
 
 
@@ -23,11 +23,11 @@ class Sequence:
             known_sequences[self.name] = self
 
     @staticmethod
-    def rounds(n, exercice, rest):
+    def rounds(n: int, exercice: Exercice, waiting: Waiting, register=False):
         name = f"{n}_{exercice.name}"
-        description = f"{n} {exercice.name} ({rest})"
-        exercices = flatten(intersperse([copy.deepcopy(exercice) for _ in range(n)], rest))
-        sequence = Sequence(name=name, description=description, exercices=exercices, register=False)
+        description = f"{n} {exercice.name} ({waiting})"
+        exercices = flatten(intersperse([copy.deepcopy(exercice) for _ in range(n)], waiting))
+        sequence = Sequence(name=name, description=description, exercices=exercices, register=register)
         return sequence
 
     @functools.cached_property
@@ -36,13 +36,13 @@ class Sequence:
 
     @classproperty
     def known_tags(cls, obj) -> Set[str]:  # pylint: disable=no-self-argument,no-self-use,unused-argument
-        return set().union(*[sequence.tags for sequence in known_sequences.values()])  # type: ignore # pylint: disable=not-an-iterable
+        return set().union(*[sequence.tags for sequence in known_sequences.values()])  # type: ignore
 
     def run(self, dry=False):
         number = 0
-        widgets = [progressbar.Variable("progression", format='{formatted_value}')]
+        widgets = [Variable("progression", format='{formatted_value}')]
         print(self)
-        with progressbar.ProgressBar(max_value=self.length, widgets=widgets) as pbar:
+        with ProgressBar(max_value=self.length, widgets=widgets) as pbar:
             for exercice in self.exercices:
                 if not isinstance(exercice, Waiting):
                     number += 1
@@ -134,4 +134,9 @@ class TheEndSequence(Sequence):
 
 known_sequences: Dict[str, Sequence] = {}
 
-_10_rhythmic_push_up = Sequence.rounds(10, rhythmic_push_up, maintain)
+_10_rhythmic_push_up = Sequence.rounds(n=10, exercice=rhythmic_push_up, waiting=Maintain(), register=True)
+
+
+def create_sequence(name: str, description: str, exercices: Tuple[BaseExercice, ...], tags: Optional[Set[str]] = None) -> Sequence:
+    real_tags: FrozenSet[str] = frozenset(tags) if tags is not None else frozenset()
+    return Sequence(name=name, description=description, exercices=exercices, tags=real_tags)  # type: ignore

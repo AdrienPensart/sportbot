@@ -57,7 +57,7 @@ class BaseSound:
         wait_for = media_player.get_length() / 1000
         time.sleep(wait_for)
 
-    def create(self, path=None, dry=False, force=False):
+    def create(self, path: Optional[str] = None, dry=False, force=False):
         path = path if path is not None else self.path
         if os.path.isfile(path) and not force:
             logger.warning(f"{path} already exists, do not recreate")

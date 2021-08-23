@@ -4,7 +4,7 @@ from typing import FrozenSet
 import functools
 import attr
 from sportbot.helpers import flatten
-from sportbot.sound import Sound
+from sportbot.sound import TempSound
 from sportbot.sequence import Sequence, RestSequence, TheEndSequence
 from sportbot.training import Training
 from sportbot.exercice import Exercice, Prepare
@@ -18,7 +18,7 @@ class Boxing(Exercice):
 
     @functools.cached_property
     def sound(self):
-        return Sound(self.name, directory='/tmp')
+        return TempSound(self.name)
 
 
 @attr.s(auto_attribs=True, repr=False)

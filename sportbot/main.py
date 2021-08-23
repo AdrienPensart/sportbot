@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
+from pathlib import Path
 import sys
 import logging
 import click
+import colorlog  # type: ignore
 import progressbar  # type: ignore
 from click_skeleton import skeleton, doc, backtrace, AdvancedGroup
 from sportbot import version
-from sportbot.sound import Sound
+from sportbot.sound import TempSound
 from sportbot.training import known_trainings
 from sportbot.sequence import known_sequences, Sequence, create_sequence
 from sportbot.exercice import known_exercices, Exercice, Prepare, TheEnd
@@ -22,10 +24,31 @@ dry_option = click.option('--dry', is_flag=True)
 
 
 @skeleton(name=PROG_NAME, version=version.__version__, auto_envvar_prefix='SP')
-def cli():
+@click.option('--debug', help="Verbose mode", is_flag=True)
+def cli(debug):
     """SportBot."""
     if 'pytest' not in sys.modules:
         progressbar.streams.wrap(stderr=True, stdout=True)
+    if debug:
+        root_logger = logging.getLogger()
+        root_logger.setLevel(logging.DEBUG)
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(logging.DEBUG)
+        stream_handler.setFormatter(
+            colorlog.ColoredFormatter(
+                fmt='%(log_color)s%(name)s | %(asctime)s | %(levelname)s | line: %(lineno)d | %(message)s',
+                datefmt='%Y-%d-%d %H:%M:%S',
+                log_colors={
+                    'DEBUG': 'cyan',
+                    'INFO': 'green',
+                    'WARNING': 'yellow',
+                    'ERROR': 'red',
+                    'CRITICAL': 'white,bg_red',
+                },
+            )
+        )
+        root_logger.handlers = []
+        root_logger.addHandler(stream_handler)
 
 
 @cli.group(help='Boxing Training', cls=AdvancedGroup)
@@ -162,8 +185,9 @@ def exercice_start(name: str, dry: bool):
     show_default=True,
 )
 def generate_sound(name: str, dry: bool, path: str, force: bool):
-    sound = Sound(name, directory=path)
+    sound = TempSound(name, directory=Path(path))
     sound.create(dry=dry, force=force)
+    sound.say(dry)
 
 
 @cli.command(short_help='Generates a README.rst', aliases=['doc'])

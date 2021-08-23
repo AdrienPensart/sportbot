@@ -11,6 +11,7 @@ click-option-group==0.5.3; python_version >= "3.6" and python_version <= "3.9"
 click-skeleton==0.15; python_version >= "3.6" and python_version <= "3.9"
 click==8.0.1; python_version >= "3.6" and python_version <= "3.9"
 colorama==0.4.4; python_version >= "3.6" and python_full_version < "3.0.0" and python_version <= "3.9" and sys_platform == "win32" and platform_system == "Windows" or python_version >= "3.6" and python_version <= "3.9" and python_full_version >= "3.5.0" and sys_platform == "win32" and platform_system == "Windows"
+colorlog==5.0.1
 coverage==5.5; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4"
 docutils==0.17.1; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
 execnet==1.9.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6"
@@ -28,9 +29,12 @@ mypy-extensions==0.4.3; python_version >= "3.5"
 mypy==0.910; python_version >= "3.5"
 packaging==21.0; python_version >= "3.6" and python_version <= "3.9"
 platformdirs==2.2.0; python_version >= "3.6" and python_version < "4.0"
+playsound==1.3.0
 pluggy==0.13.1; python_version >= "3.6" and python_full_version < "3.0.0" and python_version <= "3.9" or python_version >= "3.6" and python_version <= "3.9" and python_full_version >= "3.4.0"
 progressbar2==3.53.1
 py==1.10.0; python_version >= "3.6" and python_full_version < "3.0.0" and python_version <= "3.9" or python_version >= "3.6" and python_version <= "3.9" and python_full_version >= "3.5.0"
+pycairo==1.20.1; python_version >= "3.6" and python_version < "4"
+pygobject==3.40.1; python_version >= "3.6" and python_version < "4"
 pylint==2.10.2; python_version >= "3.6" and python_version < "4.0"
 pyparsing==2.4.7; python_version >= "3.6" and python_full_version < "3.0.0" and python_version <= "3.9" or python_version >= "3.6" and python_version <= "3.9" and python_full_version >= "3.3.0"
 pytest-click==1.0.2; python_version >= "3.6" and python_version <= "3.9"
@@ -40,7 +44,6 @@ pytest-xdist==2.3.0; python_version >= "3.6"
 pytest==6.2.4; python_version >= "3.6"
 python-slugify==5.0.2; python_version >= "3.6"
 python-utils==2.5.6
-python-vlc==3.0.12118
 requests==2.26.0; python_version >= "3.6" and python_full_version < "3.0.0" and python_version <= "3.9" or python_full_version >= "3.6.0" and python_version >= "3.6" and python_version <= "3.9"
 restructuredtext-lint==1.3.2
 semver==2.13.0; python_version >= "3.6" and python_full_version < "3.0.0" and python_version <= "3.9" or python_version >= "3.6" and python_version <= "3.9" and python_full_version >= "3.4.0"

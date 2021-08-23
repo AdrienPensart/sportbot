@@ -6,13 +6,15 @@ authors = ["Adrien Pensart <adrien.pensart@corp.ovh.com>"]
 
 [tool.poetry.dependencies]
 python = ">=3.6,<=3.9"
-python-vlc = "^3.0.12118"
 gTTS = "^2.2.2"
 click-skeleton = "^0.15"
 python-slugify = "^5.0.2"
 types-python-slugify = "^0.1.2"
 attrs = "^21.2.0"
 progressbar2 = "^3.53.1"
+colorlog = "^5.0.1"
+playsound = "^1.3.0"
+PyGObject = "^3.40.1"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.10.2"

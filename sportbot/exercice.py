@@ -4,7 +4,7 @@ import time
 import click
 import attr
 from progressbar import ProgressBar  # type: ignore
-from sportbot.sound import player, Sound, Bell
+from sportbot.sound import BaseSound, Bell
 from sportbot.helpers import classproperty
 
 
@@ -15,7 +15,7 @@ class BaseExercice:
     color: str
     silence: bool = False
     stopwatch: int = 0
-    tags: FrozenSet[str] = attr.ib(default=frozenset(), converter=frozenset)
+    tags: FrozenSet[str] = frozenset()
     register: bool = True
 
     def __attrs_post_init__(self) -> None:
@@ -34,7 +34,7 @@ class BaseExercice:
 
     @functools.cached_property
     def sound(self):
-        return Sound(self.name)
+        return BaseSound(self.name)
 
     @classproperty
     def known_tags(cls, obj) -> Set[str]:  # pylint: disable=no-self-argument,no-self-use,unused-argument
@@ -43,8 +43,8 @@ class BaseExercice:
     def run(self, prefix: Optional[str] = None, dry=False, pbar: Optional[ProgressBar] = None):
         prefix = prefix if prefix is not None else ''
         if not self.silence:
-            self.sound.say(dry)
-            self.bell.say(dry)
+            self.sound.say(dry=dry)
+            self.bell.say(dry=dry)
         while self.stopwatch > 0:
             progression = f"{prefix} : {self}"
             if pbar:
@@ -56,7 +56,6 @@ class BaseExercice:
 
             if not dry:
                 time.sleep(1)
-                player().stop()
 
 
 @attr.s(auto_attribs=True, hash=True, repr=False)
@@ -72,7 +71,24 @@ class Waiting(BaseExercice):
 @attr.s(auto_attribs=True, hash=True, repr=False)
 class Prepare(Waiting):
     name: str = 'Prepare'
-    duration: int = 20
+    duration: int = 10
+
+    def run(self, prefix: Optional[str] = None, dry=False, pbar: Optional[ProgressBar] = None):
+        prefix = prefix if prefix is not None else ''
+        if not self.silence:
+            self.sound.say(dry=dry)
+
+        while self.stopwatch > 0:
+            progression = f"{prefix} : {self}"
+            sound_countdown = BaseSound(name=str(self.stopwatch))
+            if not self.silence:
+                sound_countdown.say(dry=dry)
+            if pbar:
+                pbar.update(progression=progression)
+
+            if not pbar or dry:
+                print(progression)
+            self.stopwatch -= 1
 
 
 @attr.s(auto_attribs=True, hash=True, repr=False)

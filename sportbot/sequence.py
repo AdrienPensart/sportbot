@@ -15,7 +15,7 @@ class Sequence:
     name: str
     exercices: Tuple[BaseExercice, ...]
     description: Optional[str] = None
-    tags: FrozenSet[str] = attr.ib(default=frozenset(), converter=frozenset)
+    tags: FrozenSet[str] = frozenset()
     register: bool = True
 
     def __attrs_post_init__(self) -> None:

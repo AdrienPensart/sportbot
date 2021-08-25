@@ -120,6 +120,7 @@ def _countdown(duration, paused):
 
     loop = asyncio.get_event_loop()
     kb = KeyBindings()
+
     @kb.add("c-c")
     @kb.add("q")
     def leave(event):
@@ -168,3 +169,7 @@ def _countdown(duration, paused):
 
 def main(**kwargs):
     return cli.main(prog_name=PROG_NAME, **kwargs)
+
+
+if __name__ == '__main__':
+    main()

@@ -2,9 +2,9 @@ from typing import Optional
 from pathlib import Path
 import logging
 import attr
-from playsound import playsound  # type: ignore
 from slugify import slugify
 from gtts import gTTS  # type: ignore
+from sportbot.playsound import play
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class BaseSound:
     def say(self, dry=False):
         if dry:
             return
-        playsound(self.path)
+        play(self.path)
 
     @property
     def path(self) -> Path:

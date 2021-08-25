@@ -1,7 +1,7 @@
 
   FileNotFoundError
 
-  [Errno 2] No such file or directory: b'/mnt/c/Users/68687/AppData/Local/Microsoft/WindowsApps/poetry2setup'
+  [Errno 2] No such file or directory: b'/usr/games/poetry2setup'
 
   at ~/.pyenv/versions/3.8.6/lib/python3.8/os.py:601 in _execvpe
        597│         path_list = map(fsencode, path_list)

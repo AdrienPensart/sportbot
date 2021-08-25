@@ -1,9 +1,6 @@
 # pylint: disable=missing-module-docstring,missing-function-docstring
 import pytest
 from click_skeleton.testing import run_cli
-from prompt_toolkit.application import create_app_session
-from prompt_toolkit.input import create_pipe_input
-from prompt_toolkit.output import DummyOutput
 from sportbot import version
 from sportbot.main import cli
 

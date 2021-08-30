@@ -44,10 +44,10 @@ class TempSound(BaseSound):
     def create(self, path: Optional[Path] = None, dry=False, force=False):
         path = path if path is not None else self.path
         if path.is_file() and not force:
-            logger.debug(f"{self} : already exists")
+            logger.warning(f"{self} : already exists")
             return
 
         tts = gTTS(self.name)
         if not dry:
-            logger.debug(f"{self} : creating")
+            logger.warning(f"{self} : creating to {path}")
             tts.save(path)

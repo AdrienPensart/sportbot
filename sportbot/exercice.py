@@ -78,7 +78,7 @@ class Prepare(Waiting):
         if not self.silence:
             self.sound.say(dry=dry)
 
-        while self.stopwatch > 0:
+        while True:
             progression = f"{prefix} : {self}"
             sound_countdown = BaseSound(name=str(self.stopwatch))
             if not self.silence:
@@ -89,6 +89,8 @@ class Prepare(Waiting):
             if not pbar or dry:
                 print(progression)
             self.stopwatch -= 1
+            if self.stopwatch == 0:
+                break
 
 
 @attr.s(auto_attribs=True, hash=True, repr=False)

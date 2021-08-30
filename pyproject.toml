@@ -5,19 +5,19 @@ description = "SportBox personal trainer"
 authors = ["Adrien Pensart <adrien.pensart@corp.ovh.com>"]
 
 [tool.poetry.dependencies]
-python = ">=3.7,<=3.9"
+python = ">=3.8,<=3.9"
 gTTS = "^2.2.2"
 python-slugify = "^5.0.2"
 types-python-slugify = "^0.1.2"
 attrs = "^21.2.0"
 progressbar2 = "^3.53.1"
-PyGObject = "^3.40.1"
 python-cfonts = "^1.5.2"
 click-skeleton = "^0.16"
 pendulum = "^2.1.2"
 prompt-toolkit = "^3.0.20"
 colorlog = "^6.4.1"
-gst = "^0.1.0"
+pyobjc = {version = "^7.3", markers = "sys_platform == 'darwin'"}
+PyGObject = {version = "^3.40.1", markers = "sys_platform == 'linux'"}
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.10.2"

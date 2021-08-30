@@ -18,6 +18,7 @@ from click_skeleton.helpers import mysplit
 from sportbot import version
 from sportbot.options import dry_option
 from sportbot.sound import TempSound
+from sportbot.playsound import PlaysoundException
 import sportbot
 import sportbot.commands
 
@@ -168,7 +169,11 @@ def _countdown(duration, paused):
 
 
 def main(**kwargs):
-    return cli.main(prog_name=PROG_NAME, **kwargs)
+    try:
+        return cli.main(prog_name=PROG_NAME, **kwargs)
+    except PlaysoundException as e:
+        logger.error(e)
+    return 1
 
 
 if __name__ == '__main__':

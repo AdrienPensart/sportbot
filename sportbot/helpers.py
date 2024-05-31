@@ -1,11 +1,11 @@
-import sys
-import datetime
-import copy
 import collections
+import copy
+import datetime
+import sys
 
 
 class classproperty:
-    __slots__ = ('getter', )
+    __slots__ = ("getter",)
 
     def __init__(self, getter):
         self.getter = getter
@@ -29,12 +29,12 @@ class Py2Key:
 
 
 def seconds_to_human(seconds: int) -> str:
-    '''Human readable duration from seconds'''
+    """Human readable duration from seconds"""
     return str(datetime.timedelta(seconds=seconds))
 
 
 def deep_flatten(iterables):
-    '''Recursively flatten argument'''
+    """Recursively flatten argument"""
     for element in iterables:
         if isinstance(element, collections.abc.Iterable) and not isinstance(element, (str, bytes)):
             yield from deep_flatten(element)

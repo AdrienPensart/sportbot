@@ -14,9 +14,8 @@ Commands
 
   Commands:
     boxing          Boxing Training
-    completion      Shell completion
     countdown       Generate sound
-    exercice        Exercice Tool
+    exercise        Exercise Tool
     generate-sound  Generate sound
     help            Print help
     readme (doc)    Generates a README.rst
@@ -57,47 +56,6 @@ sportbot boxing rounds
     --rest INTEGER
     -h, --help          Show this message and exit.
 
-sportbot completion
-*******************
-.. code-block::
-
-  Usage: sportbot completion [OPTIONS] COMMAND [ARGS]...
-
-    Shell completion subcommand
-
-  Options:
-    -h, --help  Show this message and exit.
-
-  Commands:
-    help                   Print help
-    install                Install the click-completion-command completion
-    show (generate,print)  Show the click-completion-command completion code
-
-sportbot completion install
-***************************
-.. code-block::
-
-  Usage: sportbot completion install [OPTIONS] [[bash|fish|zsh|powershell]] [PATH]
-
-    Auto install shell completion code in your rc file
-
-  Options:
-    -i, --case-insensitive  Case insensitive completion
-    --append / --overwrite  Append the completion code to the file
-    -h, --help              Show this message and exit.
-
-sportbot completion show
-************************
-.. code-block::
-
-  Usage: sportbot completion show [OPTIONS] [[bash|fish|zsh|powershell]]
-
-    Generate shell code to enable completion
-
-  Options:
-    -i, --case-insensitive  Case insensitive completion
-    -h, --help              Show this message and exit.
-
 sportbot countdown
 ******************
 .. code-block::
@@ -110,13 +68,13 @@ sportbot countdown
     --paused
     -h, --help  Show this message and exit.
 
-sportbot exercice
+sportbot exercise
 *****************
 .. code-block::
 
-  Usage: sportbot exercice [OPTIONS] COMMAND [ARGS]...
+  Usage: sportbot exercise [OPTIONS] COMMAND [ARGS]...
 
-    Exercice Tool
+    Exercise Tool
 
   Options:
     -h, --help  Show this message and exit.
@@ -127,11 +85,11 @@ sportbot exercice
     start  Start exercice
     tags   List available tags
 
-sportbot exercice list
+sportbot exercise list
 **********************
 .. code-block::
 
-  Usage: sportbot exercice list [OPTIONS]
+  Usage: sportbot exercise list [OPTIONS]
 
     List available exercices
 
@@ -139,11 +97,11 @@ sportbot exercice list
     --tag TEXT  Tag filter
     -h, --help  Show this message and exit.
 
-sportbot exercice start
+sportbot exercise start
 ***********************
 .. code-block::
 
-  Usage: sportbot exercice start [OPTIONS] NAME
+  Usage: sportbot exercise start [OPTIONS] NAME
 
     Start exercice
 
@@ -151,11 +109,11 @@ sportbot exercice start
     --dry
     -h, --help  Show this message and exit.
 
-sportbot exercice tags
+sportbot exercise tags
 **********************
 .. code-block::
 
-  Usage: sportbot exercice tags [OPTIONS]
+  Usage: sportbot exercise tags [OPTIONS]
 
     List available tags
 
@@ -172,6 +130,7 @@ sportbot generate-sound
 
   Options:
     --dry
+    --test            Test sound afterwards
     --force           Recreate sound if already exists
     --path DIRECTORY  Sound output path  [default: .]
     -h, --help        Show this message and exit.

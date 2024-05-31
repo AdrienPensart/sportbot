@@ -1,19 +1,21 @@
-from typing import Optional
-from pathlib import Path
 import logging
-import attr
-from slugify import slugify
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Optional
+
 from gtts import gTTS  # type: ignore
+from slugify import slugify
+
 from sportbot.playsound import play
 
 logger = logging.getLogger(__name__)
 
 
-@attr.s(auto_attribs=True, repr=False, hash=True)
+@dataclass
 class BaseSound:
     name: str
-    directory: Path = Path(__file__).resolve().parent / 'sounds'
-    codec: str = 'mp3'
+    directory: Path = Path(__file__).resolve().parent / "sounds"
+    codec: str = "mp3"
 
     def __repr__(self):
         return f"name: {self.name} | slug: {self.slug} | path: {self.path}"
@@ -32,14 +34,14 @@ class BaseSound:
         return self.directory / f"{self.slug}.{self.codec}"
 
 
-@attr.s(auto_attribs=True, repr=False, hash=True)
+@dataclass
 class Bell(BaseSound):
-    name: str = 'bell'
+    name: str = "bell"
 
 
-@attr.s(auto_attribs=True, repr=False, hash=True)
+@dataclass
 class TempSound(BaseSound):
-    directory: Path = Path('/tmp')
+    directory: Path = Path("/tmp")
 
     def create(self, path: Optional[Path] = None, dry=False, force=False):
         path = path if path is not None else self.path

@@ -1,11 +1,12 @@
+from dataclasses import dataclass
 from typing import FrozenSet
-import attr
-from sportbot.exercice import Waiting
+
+from sportbot.exercise import Waiting
 
 
-@attr.s(auto_attribs=True, hash=True, repr=False)
+@dataclass
 class Rest(Waiting):
-    name: str = attr.ib(default="Rest")
+    name: str = "Rest"
     color: str = "green"
     tags: FrozenSet[str] = frozenset({"rest"})
 

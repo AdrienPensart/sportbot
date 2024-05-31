@@ -1,14 +1,16 @@
+from dataclasses import dataclass
 from typing import Dict, Tuple
+
 import click
-import attr
-from sportbot.sequence import Sequence
+
 from sportbot.helpers import seconds_to_human
+from sportbot.sequence import Sequence
 
 
-@attr.s(auto_attribs=True, repr=False, hash=True)
+@dataclass
 class Training:
-    name: str
     sequences: Tuple[Sequence, ...]
+    name: str = "Training"
     register: bool = True
 
     def __attrs_post_init__(self) -> None:
@@ -20,11 +22,14 @@ class Training:
         return set().union(*[sequence.tags for sequence in self.sequences])
 
     def __repr__(self):
-        return click.style(f"{self.name} ({len(self.sequences)} sequences), duration: {self.human_total_duration}", fg="blue")
+        return click.style(
+            f"{self.name} ({len(self.sequences)} sequences), duration: {self.human_total_duration}",
+            fg="blue",
+        )
 
     @property
     def total_duration(self) -> int:
-        return sum([sequence.total_duration for sequence in self.sequences])
+        return sum(sequence.total_duration for sequence in self.sequences)
 
     @property
     def human_total_duration(self) -> str:

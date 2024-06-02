@@ -2,7 +2,7 @@ import click
 from beartype import beartype
 from click_skeleton import AdvancedGroup
 
-from sportbot import Boxing, Prepare, Rest, Sequence, Tag, TheEnd
+from sportbot import Boxing, Prepare, Rest, Sequence, TheEnd
 from sportbot.helpers import flatten
 from sportbot.options import (
     dry_option,
@@ -13,7 +13,6 @@ from sportbot.options import (
     rounds_option,
     silence_option,
 )
-from sportbot.sequence import create_sequence
 
 
 @click.group(help="Boxing Training", cls=AdvancedGroup)
@@ -42,17 +41,16 @@ def _rounds(
     end: int,
     rounds: int,
 ) -> None:
-    create_sequence(
+    Sequence(
         name=name,
         description="Boxing rounds",
-        exercices=flatten(
+        exercises=flatten(
             Prepare(duration=prepare),
             Sequence.rounds(
                 n=rounds,
-                exercice=Boxing(duration=duration),
+                exercise=Boxing(duration=duration),
                 waiting=Rest(duration=rest),
-            ).exercices,
+            ).exercises,
             TheEnd(duration=end),
         ),
-        tags={Tag.BOXING},
     ).run(dry=dry, silence=silence)

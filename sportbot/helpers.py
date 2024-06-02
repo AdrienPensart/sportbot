@@ -45,25 +45,25 @@ def flatten(*iterables: Any) -> list:
 
 
 @beartype
-def join_exercices(iterable: Iterable, rest: Any) -> Generator[Exercise, None, None]:
+def join_exercises(iterable: Iterable, rest: Any) -> Generator[Exercise, None, None]:
     it = iter(iterable)
     n_round = 1
     total_round = sum(1 for i in iterable)
 
     try:
-        first_exercice = next(it)
-        first_exercice.name = f"{first_exercice.name}, round {n_round} on {total_round}"
-        yield first_exercice
+        first_exercise = next(it)
+        first_exercise.name = f"{first_exercise.name}, round {n_round} on {total_round}"
+        yield first_exercise
     except StopIteration:
         pass
 
-    for next_exercice in it:
+    for next_exercise in it:
         yield copy.deepcopy(rest)
         n_round += 1
-        next_exercice.name = f"{next_exercice.name}, round {n_round} on {total_round}"
-        yield next_exercice
+        next_exercise.name = f"{next_exercise.name}, round {n_round} on {total_round}"
+        yield next_exercise
 
 
 @beartype
-def intersperse(exercices: Iterable, rest: Any) -> list:
-    return list(join_exercices(exercices, rest))
+def intersperse(exercises: Iterable, rest: Any) -> list:
+    return list(join_exercises(exercises, rest))

@@ -81,10 +81,10 @@ sportbot exercise
     -h, --help  Show this message and exit.
 
   Commands:
-    custom  Start custom exercice
+    custom  Start custom exercise
     help    Print help
-    list    List available exercices
-    start   Start exercice
+    list    List available exercises
+    start   Start exercise
     tags    List available tags
 
 sportbot exercise custom
@@ -93,7 +93,7 @@ sportbot exercise custom
 
   Usage: sportbot exercise custom [OPTIONS] NAME
 
-    Start custom exercice
+    Start custom exercise
 
   Options:
     --duration INTEGER
@@ -107,7 +107,7 @@ sportbot exercise list
 
   Usage: sportbot exercise list [OPTIONS]
 
-    List available exercices
+    List available exercises
 
   Options:
     --tag TEXT  Tag filter
@@ -119,7 +119,7 @@ sportbot exercise start
 
   Usage: sportbot exercise start [OPTIONS] NAME
 
-    Start exercice
+    Start exercise
 
   Options:
     --dry / --no-dry          [default: no-dry]

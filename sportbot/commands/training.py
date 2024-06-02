@@ -25,8 +25,8 @@ def _list(tags: tuple[str, ...]) -> None:
             if tags and not any(tag in sequence.tags for tag in tags):
                 continue
             print(f"\t{sequence}")
-            for exercice in sequence.exercices:
-                print(f"\t\t{exercice}")
+            for exercise in sequence.exercises:
+                print(f"\t\t{exercise}")
 
 
 @cli.command("start", help="Start training")

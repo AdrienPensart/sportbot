@@ -22,7 +22,7 @@ class Exercise:
 
     def __post_init__(self) -> None:
         self.stopwatch = self.duration
-        if self.register and not isinstance(self, Waiting):
+        if self.register and not isinstance(self, BaseWaiting):
             KnownExercises[self.name] = self
 
     def __repr__(self) -> str:
@@ -43,7 +43,7 @@ class Exercise:
 
     @staticmethod
     def known_tags() -> set[Tag]:
-        return set().union(*[exercice.tags for exercice in KnownExercises.values()])
+        return set().union(*[exercise.tags for exercise in KnownExercises.values()])
 
     def run(
         self,
@@ -70,58 +70,11 @@ class Exercise:
 
 
 @beartype
-@dataclass(repr=False)
-class Waiting(Exercise):
+@dataclass(repr=False, init=False)
+class BaseWaiting(Exercise):
     name: str = "Waiting"
     color: str = "bright_blue"
     tags: frozenset[Tag] = frozenset({Tag.WAITING})
-
-
-@beartype
-@dataclass(repr=False)
-class Prepare(Waiting):
-    name: str = "Prepare"
-    duration: int = 10
-
-    def run(
-        self,
-        dry: bool,
-        silence: bool,
-        prefix: str | None = None,
-        pbar: ProgressBar | None = None,
-    ) -> None:
-        prefix = prefix if prefix is not None else ""
-        if not silence:
-            self.sound.say(dry=dry)
-
-        while self.stopwatch > 0:
-            progression = f"{prefix} : {self}"
-            if not silence:
-                sound_countdown = BaseSound(name=str(self.stopwatch))
-                sound_countdown.say(dry=dry)
-            if pbar is not None:
-                pbar.update(progression=progression)
-
-            if not pbar or dry:
-                print(progression)
-            self.stopwatch -= 1
-
-            if not dry:
-                time.sleep(1)
-
-
-@beartype
-@dataclass(repr=False)
-class Maintain(Waiting):
-    name: str = "Maintain"
-    duration: int = 2
-
-
-@beartype
-@dataclass(repr=False)
-class TheEnd(Waiting):
-    name: str = "The End"
-    duration: int = 5
 
 
 KnownExercises: dict[str, Exercise] = {}

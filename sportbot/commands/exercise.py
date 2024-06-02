@@ -13,14 +13,14 @@ def cli() -> None:
     pass
 
 
-@cli.command("list", help="List available exercices")
+@cli.command("list", help="List available exercises")
 @click.option("--tag", "tags", help="Tag filter", multiple=True)
 @beartype
 def _list(tags: tuple[str, ...]) -> None:
-    for exercice in sorted(KnownExercises.values(), key=Py2Key):
-        if tags and not any(tag in exercice.tags for tag in tags):
+    for exercise in sorted(KnownExercises.values(), key=Py2Key):
+        if tags and not any(tag in exercise.tags for tag in tags):
             continue
-        print(f"{exercice}")
+        print(f"{exercise}")
 
 
 @cli.command("tags", help="List available tags")
@@ -30,26 +30,26 @@ def tags() -> None:
         print(tag)
 
 
-@cli.command(help="Start exercice")
+@cli.command(help="Start exercise")
 @click.argument("name")
 @dry_option
 @silence_option
 @beartype
 def start(name: str, dry: bool, silence: bool) -> None:
-    exercice = KnownExercises.get(name, None)
-    if not exercice:
-        print("Unknown exercice")
+    exercise = KnownExercises.get(name, None)
+    if not exercise:
+        print("Unknown exercise")
         return
 
-    exercice.run(dry=dry, silence=silence)
+    exercise.run(dry=dry, silence=silence)
 
 
-@cli.command(help="Start custom exercice")
+@cli.command(help="Start custom exercise")
 @click.argument("name")
 @duration_option
 @dry_option
 @silence_option
 @beartype
 def custom(name: str, dry: bool, silence: bool, duration: int) -> None:
-    exercice = Exercise(name=name, duration=duration)
-    exercice.run(dry=dry, silence=silence)
+    exercise = Exercise(name=name, duration=duration)
+    exercise.run(dry=dry, silence=silence)

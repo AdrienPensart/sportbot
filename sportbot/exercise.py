@@ -23,7 +23,7 @@ class Exercise:
     def __post_init__(self) -> None:
         self.stopwatch = self.duration
         if self.register and not isinstance(self, Waiting):
-            known_exercises[self.name] = self
+            KnownExercises[self.name] = self
 
     def __repr__(self) -> str:
         if self.stopwatch != self.duration:
@@ -43,13 +43,13 @@ class Exercise:
 
     @staticmethod
     def known_tags() -> set[Tag]:
-        return set().union(*[exercice.tags for exercice in known_exercises.values()])
+        return set().union(*[exercice.tags for exercice in KnownExercises.values()])
 
     def run(
         self,
+        dry: bool,
+        silence: bool,
         prefix: str | None = None,
-        dry: bool = False,
-        silence: bool = False,
         pbar: ProgressBar | None = None,
     ) -> None:
         prefix = prefix if prefix is not None else ""
@@ -85,9 +85,9 @@ class Prepare(Waiting):
 
     def run(
         self,
+        dry: bool,
+        silence: bool,
         prefix: str | None = None,
-        dry: bool = False,
-        silence: bool = False,
         pbar: ProgressBar | None = None,
     ) -> None:
         prefix = prefix if prefix is not None else ""
@@ -124,7 +124,7 @@ class TheEnd(Waiting):
     duration: int = 5
 
 
-known_exercises: dict[str, Exercise] = {}
+KnownExercises: dict[str, Exercise] = {}
 
 
 @beartype

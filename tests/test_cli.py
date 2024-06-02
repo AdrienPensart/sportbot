@@ -169,6 +169,21 @@ def test_cli_exercise_start(cli_runner: CliRunner) -> None:
     )
 
 
+def test_cli_exercise_custom(cli_runner: CliRunner) -> None:
+    run_cli(
+        cli_runner,
+        cli,
+        [
+            "exercise",
+            "custom",
+            "custom-exercise",
+            "--duration",
+            1,
+            "--dry",
+        ],
+    )
+
+
 def test_cli_exercise_tags(cli_runner: CliRunner) -> None:
     run_cli(
         cli_runner,

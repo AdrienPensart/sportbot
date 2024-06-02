@@ -2,13 +2,18 @@ import click
 from beartype import beartype
 from click_skeleton import AdvancedGroup
 
-from sportbot.boxing import Boxing
-from sportbot.exercise import Prepare, TheEnd
+from sportbot import Boxing, Prepare, Rest, Sequence, Tag, TheEnd
 from sportbot.helpers import flatten
-from sportbot.options import dry_option, silence_option
-from sportbot.rest import Rest
-from sportbot.sequence import Sequence, create_sequence
-from sportbot.tag import Tag
+from sportbot.options import (
+    dry_option,
+    duration_option,
+    end_option,
+    prepare_option,
+    rest_option,
+    rounds_option,
+    silence_option,
+)
+from sportbot.sequence import create_sequence
 
 
 @click.group(help="Boxing Training", cls=AdvancedGroup)
@@ -20,12 +25,12 @@ def cli() -> None:
 @cli.command("rounds", help="Create custom rounds")
 @dry_option
 @silence_option
+@duration_option
+@prepare_option
+@end_option
+@rest_option
+@rounds_option
 @click.option("--name", default="Rounds")
-@click.option("--rounds", type=int, default=12)
-@click.option("--duration", type=int, default=120)
-@click.option("--prepare", type=int, default=10)
-@click.option("--end", type=int, default=5)
-@click.option("--rest", type=int, default=60)
 @beartype
 def _rounds(
     name: str,

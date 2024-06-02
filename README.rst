@@ -47,14 +47,15 @@ sportbot boxing rounds
     Create custom rounds
 
   Options:
-    --dry
-    --name TEXT
-    --rounds INTEGER
+    --dry / --no-dry          [default: no-dry]
+    --silence / --no-silence  [default: no-silence]
     --duration INTEGER
     --prepare INTEGER
     --end INTEGER
     --rest INTEGER
-    -h, --help          Show this message and exit.
+    --rounds INTEGER
+    --name TEXT
+    -h, --help                Show this message and exit.
 
 sportbot countdown
 ******************
@@ -80,10 +81,25 @@ sportbot exercise
     -h, --help  Show this message and exit.
 
   Commands:
-    help   Print help
-    list   List available exercices
-    start  Start exercice
-    tags   List available tags
+    custom  Start custom exercice
+    help    Print help
+    list    List available exercices
+    start   Start exercice
+    tags    List available tags
+
+sportbot exercise custom
+************************
+.. code-block::
+
+  Usage: sportbot exercise custom [OPTIONS] NAME
+
+    Start custom exercice
+
+  Options:
+    --duration INTEGER
+    --dry / --no-dry          [default: no-dry]
+    --silence / --no-silence  [default: no-silence]
+    -h, --help                Show this message and exit.
 
 sportbot exercise list
 **********************
@@ -106,8 +122,9 @@ sportbot exercise start
     Start exercice
 
   Options:
-    --dry
-    -h, --help  Show this message and exit.
+    --dry / --no-dry          [default: no-dry]
+    --silence / --no-silence  [default: no-silence]
+    -h, --help                Show this message and exit.
 
 sportbot exercise tags
 **********************
@@ -129,7 +146,7 @@ sportbot generate-sound
     Generate sound
 
   Options:
-    --dry
+    --dry / --no-dry  [default: no-dry]
     --test            Test sound afterwards
     --force           Recreate sound if already exists
     --path DIRECTORY  Sound output path  [default: .]
@@ -195,8 +212,9 @@ sportbot sequence start
     Start sequence
 
   Options:
-    --dry
-    -h, --help  Show this message and exit.
+    --dry / --no-dry          [default: no-dry]
+    --silence / --no-silence  [default: no-silence]
+    -h, --help                Show this message and exit.
 
 sportbot training
 *****************
@@ -235,8 +253,9 @@ sportbot training start
     Start training
 
   Options:
-    --dry
-    -h, --help  Show this message and exit.
+    --dry / --no-dry          [default: no-dry]
+    --silence / --no-silence  [default: no-silence]
+    -h, --help                Show this message and exit.
 
 sportbot version
 ****************

@@ -2,9 +2,9 @@ import click
 from beartype import beartype
 from click_skeleton import AdvancedGroup
 
-from sportbot.exercise import Exercise, known_exercises
+from sportbot import Exercise, KnownExercises
 from sportbot.helpers import Py2Key
-from sportbot.options import dry_option, silence_option
+from sportbot.options import dry_option, duration_option, silence_option
 
 
 @click.group(help="Exercise Tool", cls=AdvancedGroup)
@@ -17,7 +17,7 @@ def cli() -> None:
 @click.option("--tag", "tags", help="Tag filter", multiple=True)
 @beartype
 def _list(tags: tuple[str, ...]) -> None:
-    for exercice in sorted(known_exercises.values(), key=Py2Key):
+    for exercice in sorted(KnownExercises.values(), key=Py2Key):
         if tags and not any(tag in exercice.tags for tag in tags):
             continue
         print(f"{exercice}")
@@ -30,15 +30,26 @@ def tags() -> None:
         print(tag)
 
 
-@cli.command("start", help="Start exercice")
+@cli.command(help="Start exercice")
 @click.argument("name")
 @dry_option
 @silence_option
 @beartype
 def start(name: str, dry: bool, silence: bool) -> None:
-    exercice = known_exercises.get(name, None)
+    exercice = KnownExercises.get(name, None)
     if not exercice:
         print("Unknown exercice")
         return
 
+    exercice.run(dry=dry, silence=silence)
+
+
+@cli.command(help="Start custom exercice")
+@click.argument("name")
+@duration_option
+@dry_option
+@silence_option
+@beartype
+def custom(name: str, dry: bool, silence: bool, duration: int) -> None:
+    exercice = Exercise(name=name, duration=duration)
     exercice.run(dry=dry, silence=silence)

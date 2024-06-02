@@ -17,7 +17,7 @@ class Training:
 
     def __post_init__(self) -> None:
         if self.register:
-            known_trainings[self.name] = self
+            KnownTrainings[self.name] = self
 
     @property
     def tags(self) -> set[Tag]:
@@ -37,9 +37,9 @@ class Training:
     def human_total_duration(self) -> str:
         return seconds_to_human(self.total_duration)
 
-    def run(self, dry: bool = False) -> None:
+    def run(self, dry: bool, silence: bool) -> None:
         for sequence in self.sequences:
-            sequence.run(dry=dry)
+            sequence.run(dry=dry, silence=silence)
 
 
-known_trainings: dict[str, Training] = {}
+KnownTrainings: dict[str, Training] = {}

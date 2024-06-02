@@ -2,9 +2,9 @@ import click
 from beartype import beartype
 from click_skeleton import AdvancedGroup
 
+from sportbot import KnownTrainings
 from sportbot.helpers import Py2Key
-from sportbot.options import dry_option
-from sportbot.training import known_trainings
+from sportbot.options import dry_option, silence_option
 
 
 @click.group(help="Training Tool", cls=AdvancedGroup)
@@ -17,7 +17,7 @@ def cli() -> None:
 @click.option("--tag", "tags", help="Tag filter", multiple=True)
 @beartype
 def _list(tags: tuple[str, ...]) -> None:
-    for training in sorted(known_trainings.values(), key=Py2Key):
+    for training in sorted(KnownTrainings.values(), key=Py2Key):
         if tags and not any(tag in training.tags for tag in tags):
             continue
         print(f"{training}")
@@ -31,12 +31,13 @@ def _list(tags: tuple[str, ...]) -> None:
 
 @cli.command("start", help="Start training")
 @click.argument("name")
-@beartype
 @dry_option
-def start(name: str, dry: bool) -> None:
-    training = known_trainings.get(name, None)
+@silence_option
+@beartype
+def start(name: str, dry: bool, silence: bool) -> None:
+    training = KnownTrainings.get(name, None)
     if not training:
         print("Unknown training")
         return
 
-    training.run(dry)
+    training.run(dry=dry, silence=silence)

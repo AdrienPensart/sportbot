@@ -35,8 +35,6 @@ backtrace.hook(strip_path=False, enable_on_envvar_only=False, on_tty=False)
 @beartype
 def cli(debug: bool) -> None:
     """SportBot."""
-    # if 'pytest' not in sys.modules:
-    #     progressbar.streams.wrap(stderr=True, stdout=True)
     level = logging.DEBUG if debug else logging.WARNING
     root_logger = logging.getLogger()
     root_logger.setLevel(level)

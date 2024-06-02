@@ -2,8 +2,8 @@ import click
 from beartype import beartype
 from click_skeleton import AdvancedGroup
 
+from sportbot import KnownSequences
 from sportbot.options import dry_option, silence_option
-from sportbot.sequence import known_sequences
 
 
 @click.group(help="Sequence Tool", cls=AdvancedGroup)
@@ -16,7 +16,7 @@ def cli() -> None:
 @click.option("--tag", "tags", help="Tag filter", multiple=True)
 @beartype
 def _list(tags: tuple[str, ...]) -> None:
-    for sequence in known_sequences.values():
+    for sequence in KnownSequences.values():
         if tags and not any(tag in sequence.tags for tag in tags):
             continue
         print(f"{sequence}")
@@ -30,7 +30,7 @@ def _list(tags: tuple[str, ...]) -> None:
 @silence_option
 @beartype
 def start(name: str, dry: bool, silence: bool) -> None:
-    sequence = known_sequences.get(name, None)
+    sequence = KnownSequences.get(name, None)
     if not sequence:
         print("Unknown sequence")
         return

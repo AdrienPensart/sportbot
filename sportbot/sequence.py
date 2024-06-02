@@ -32,7 +32,7 @@ class Sequence:
 
     def __post_init__(self) -> None:
         if self.register:
-            known_sequences[self.name] = self
+            KnownSequences[self.name] = self
 
     @classmethod
     def rounds(cls, n: int, exercice: Exercise, waiting: Waiting, register: bool = False) -> Self:
@@ -49,9 +49,9 @@ class Sequence:
 
     @staticmethod
     def known_tags() -> set[str]:
-        return set().union(*[sequence.tags for sequence in known_sequences.values()])
+        return set().union(*[sequence.tags for sequence in KnownSequences.values()])
 
-    def run(self, dry: bool = False, silence: bool = False) -> None:
+    def run(self, dry: bool, silence: bool) -> None:
         number = 0
         widgets = [Variable("progression", format="{formatted_value}")]
         print(f"{self}")
@@ -149,9 +149,9 @@ class EndSequence(Sequence):
     register: bool = False
 
 
-known_sequences: dict[str, Sequence] = {}
+KnownSequences: dict[str, Sequence] = {}
 
-_10_rhythmic_push_up = Sequence.rounds(n=10, exercice=rhythmic_push_up, waiting=Maintain(), register=True)
+_10_rhythmic_push_up = Sequence.rounds(n=10, exercice=rhythmic_push_up, waiting=Maintain())
 
 
 @beartype

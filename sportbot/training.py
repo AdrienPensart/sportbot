@@ -1,27 +1,29 @@
 from dataclasses import dataclass
-from typing import Dict, Tuple
 
 import click
+from beartype import beartype
 
 from sportbot.helpers import seconds_to_human
 from sportbot.sequence import Sequence
+from sportbot.tag import Tag
 
 
+@beartype
 @dataclass
 class Training:
-    sequences: Tuple[Sequence, ...]
+    sequences: tuple[Sequence, ...]
     name: str = "Training"
     register: bool = True
 
-    def __attrs_post_init__(self) -> None:
+    def __post_init__(self) -> None:
         if self.register:
             known_trainings[self.name] = self
 
     @property
-    def tags(self):
+    def tags(self) -> set[Tag]:
         return set().union(*[sequence.tags for sequence in self.sequences])
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return click.style(
             f"{self.name} ({len(self.sequences)} sequences), duration: {self.human_total_duration}",
             fg="blue",
@@ -35,9 +37,9 @@ class Training:
     def human_total_duration(self) -> str:
         return seconds_to_human(self.total_duration)
 
-    def run(self, dry=False):
+    def run(self, dry: bool = False) -> None:
         for sequence in self.sequences:
             sequence.run(dry=dry)
 
 
-known_trainings: Dict[str, Training] = {}
+known_trainings: dict[str, Training] = {}

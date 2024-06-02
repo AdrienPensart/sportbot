@@ -56,3 +56,17 @@ jobs = 4
 disable = """
 too-few-public-methods,logging-format-interpolation,line-too-long,too-many-arguments,protected-access,missing-docstring,invalid-name,too-many-public-methods,too-many-instance-attributes,duplicate-code,too-many-nested-blocks,too-many-branches,too-many-return-statements,too-many-statements,too-many-locals,too-few-public-methods,too-many-ancestors,abstract-method,anomalous-backslash-in-string,import-outside-toplevel,redefined-outer-name,unnecessary-lambda,c-extension-no-member,logging-fstring-interpolation
 """
+
+[tool.mypy]
+allow_redefinition = false
+disallow_untyped_defs = true
+ignore_errors = false
+implicit_reexport = false
+local_partial_types = true
+strict_optional = true
+strict_equality = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unreachable = true
+warn_no_return = true

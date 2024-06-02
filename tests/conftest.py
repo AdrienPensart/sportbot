@@ -1,7 +1,8 @@
 from beartype import beartype
+from beartype.typing import Generator
 from click.testing import CliRunner
 from prompt_toolkit.application import create_app_session
-from prompt_toolkit.input import create_pipe_input
+from prompt_toolkit.input import PipeInput, create_pipe_input
 from prompt_toolkit.output import DummyOutput
 from pytest import fixture
 
@@ -15,7 +16,7 @@ def cli_runner() -> CliRunner:
 
 @fixture(autouse=True, scope="function")
 @beartype
-def mock_input():
+def mock_input() -> Generator[PipeInput, None, None]:
     with create_pipe_input() as pipe_input:
         with create_app_session(input=pipe_input, output=DummyOutput()):
             yield pipe_input

@@ -1,14 +1,15 @@
 from dataclasses import dataclass
-from typing import FrozenSet
+
+from beartype import beartype
 
 from sportbot.exercise import Waiting
 
 
-@dataclass
+@beartype
+@dataclass(repr=False)
 class Rest(Waiting):
     name: str = "Rest"
     color: str = "green"
-    tags: FrozenSet[str] = frozenset({"rest"})
 
 
 # RESTS

@@ -1,34 +1,37 @@
-# type: ignore
-# bug: https://github.com/python/mypy/issues/8625
-import functools
 from dataclasses import dataclass
-from typing import FrozenSet
+from functools import cached_property
+
+from beartype import beartype
 
 from sportbot.exercise import Exercise, Prepare
 from sportbot.helpers import flatten
 from sportbot.rest import _1_minute_rest
-from sportbot.sequence import EndSequence, RestSequence, Sequence
+from sportbot.sequence import EndSequence, PrepareSequence, RestSequence, Sequence
 from sportbot.sound import TempSound
+from sportbot.tag import Tag
 from sportbot.training import Training
 
 
-@dataclass
+@beartype
+@dataclass(repr=False)
 class Boxing(Exercise):
     name: str = "Boxing"
     color: str = "red"
-    tags: FrozenSet[str] = frozenset({"boxing"})
+    tags: frozenset[Tag] = frozenset({Tag.BOXING})
 
-    @functools.cached_property
-    def sound(self):
+    @cached_property
+    def sound(self) -> TempSound:
         return TempSound(self.name)
 
 
-@dataclass
+@beartype
+@dataclass(repr=False)
 class BoxingSequence(Sequence):
-    tags: FrozenSet[str] = frozenset({"boxing"})
+    tags: frozenset[Tag] = frozenset({Tag.BOXING})
 
 
-@dataclass
+@beartype
+@dataclass(repr=False)
 class BoxingTraining(Training):
     name: str = "boxing-training"
     description: str = "Boxing Training"
@@ -57,6 +60,7 @@ _3_minutes_double_ended_bag_boxing = Boxing("Double-ended bag boxing", duration=
 boxing_training = BoxingTraining(
     sequences=tuple(
         [
+            PrepareSequence(),
             BoxingSequence(
                 name="12-rounds-2-minutes-shadow-boxing",
                 description="12 rounds of 2 minutes shadow boxing with 1 minute rest in between",

@@ -5,14 +5,19 @@ from pathlib import Path
 from urllib.parse import quote
 from urllib.request import pathname2url
 
+from beartype import beartype
+from beartype.typing import Any
+
 logger = logging.getLogger(__name__)
 
 
+@beartype
 class PlaysoundException(Exception):
     pass
 
 
-def _playsound_windows(path: Path, block=True):
+@beartype
+def _playsound_windows(path: Path, block: bool = True) -> None:
     sound = '"' + str(path) + '"'
 
     from ctypes import create_unicode_buffer, windll, wintypes  # type: ignore
@@ -29,7 +34,7 @@ def _playsound_windows(path: Path, block=True):
         wintypes.UINT,
     ]
 
-    def winCommand(*command):
+    def winCommand(command: str) -> Any:
         bufLen = 600
         buf = create_unicode_buffer(bufLen)
         command = " ".join(command)
@@ -52,7 +57,8 @@ def _playsound_windows(path: Path, block=True):
             logger.warning(f"Failed to close the file: {sound}")
 
 
-def _handle_path_osx(path: Path):
+@beartype
+def _handle_path_osx(path: Path) -> str:
     sound = str(path)
 
     if "://" not in sound:
@@ -71,7 +77,8 @@ def _handle_path_osx(path: Path):
         return parts[0] + "://" + quote(parts[1].encode("utf-8")).replace(" ", "%20")
 
 
-def _playsound_osx(path: Path, block=True):
+@beartype
+def _playsound_osx(path: Path, block: bool = True) -> None:
     from AppKit import NSSound  # type: ignore  # pylint: disable=import-error
     from Foundation import NSURL  # type: ignore  # pylint: disable=import-error
 
@@ -89,7 +96,8 @@ def _playsound_osx(path: Path, block=True):
         time.sleep(nssound.duration())
 
 
-def _playsound_unix(path: Path, block=True):
+@beartype
+def _playsound_unix(path: Path, block: bool = True) -> None:
     import gi  # type: ignore
 
     gi.require_version("Gst", "1.0")
@@ -117,7 +125,8 @@ def _playsound_unix(path: Path, block=True):
             playbin.set_state(gi.repository.Gst.State.NULL)
 
 
-def play(path: Path, block=True):
+@beartype
+def play(path: Path, block: bool = True) -> None:
     if platform.system() == "Windows":
         _playsound_windows(path, block)
     elif platform.system() == "Darwin":

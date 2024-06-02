@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 import asyncio
-
-# import sys
 import logging
 from pathlib import Path
 
-# import progressbar  # type: ignore
 import cfonts
 import click
-import colorlog  # type: ignore
+import colorlog
 import pendulum
+from beartype import beartype
+from beartype.typing import Any
 from click_skeleton import backtrace, doc, skeleton
 from click_skeleton.helpers import mysplit
 from prompt_toolkit import ANSI, Application
@@ -33,7 +32,8 @@ backtrace.hook(strip_path=False, enable_on_envvar_only=False, on_tty=False)
 
 @skeleton(name=PROG_NAME, version=version.__version__, auto_envvar_prefix="SP")
 @click.option("--debug", help="Verbose mode", is_flag=True)
-def cli(debug):
+@beartype
+def cli(debug: bool) -> None:
     """SportBot."""
     # if 'pytest' not in sys.modules:
     #     progressbar.streams.wrap(stderr=True, stdout=True)
@@ -68,7 +68,8 @@ def cli(debug):
     default="rst",
     show_default=True,
 )
-def readme(ctx, output: str):
+@beartype
+def readme(ctx: click.Context, output: str) -> None:
     """Generates a complete readme"""
     doc.readme(cli, ctx.obj.prog_name, ctx.obj.context_settings, output)
 
@@ -88,7 +89,8 @@ cli.add_groups_from_package(sportbot.commands)
     default=".",
     show_default=True,
 )
-def generate_sound(name: str, dry: bool, path: str, force: bool, test: bool):
+@beartype
+def generate_sound(name: str, dry: bool, path: str, force: bool, test: bool) -> None:
     sound = TempSound(name, directory=Path(path))
     sound.create(dry=dry, force=force)
     if test:
@@ -98,7 +100,8 @@ def generate_sound(name: str, dry: bool, path: str, force: bool, test: bool):
 @cli.command("countdown", help="Generate sound")
 @click.argument("duration")
 @click.option("--paused", is_flag=True)
-def _countdown(duration, paused):
+@beartype
+def _countdown(duration: str, paused: bool) -> None:
     """
     DURATION : HH:MM:SS or MM:SS or SS
     """
@@ -123,7 +126,7 @@ def _countdown(duration, paused):
         logger.error("Bad format for duration, should be HH:MM:SS or HH:MM or SS")
         raise click.Abort() from e
 
-    def output_countdown(c, is_paused):
+    def output_countdown(c: Any, is_paused: bool) -> ANSI:
         formatted_countdown = f"{c.hours:02d}:{c.minutes:02d}:{c.remaining_seconds:02d}"
         if is_paused:
             formatted_countdown += " (paused)"
@@ -142,11 +145,11 @@ def _countdown(duration, paused):
 
     @kb.add("c-c")
     @kb.add("q")
-    def leave(event):
+    def leave(event: Any) -> None:
         event.app.exit()
 
     @kb.add("space")
-    def switch_paused(event):  # pylint: disable=unused-argument
+    def switch_paused(event: Any) -> None:
         event.app.paused = not event.app.paused
         label.text = output_countdown(event.app.countdown, event.app.paused)
         app.invalidate()
@@ -162,25 +165,25 @@ def _countdown(duration, paused):
         ],
     )
     layout = Layout(root_container)
-    app = Application(layout=layout, key_bindings=kb, full_screen=True)
+    app: Application = Application(layout=layout, key_bindings=kb, full_screen=True)
 
-    app.countdown = base_countdown
-    app.paused = paused
+    app.countdown = base_countdown  # type: ignore[attr-defined]
+    app.paused = paused  # type: ignore[attr-defined]
 
-    async def update_countdown():
+    async def update_countdown() -> None:
         while True:
-            if not app.paused:
-                app.countdown -= pendulum.duration(seconds=1)
-            label.text = output_countdown(app.countdown, app.paused)
+            if not app.paused:  # type: ignore[attr-defined]
+                app.countdown -= pendulum.duration(seconds=1)  # type: ignore[attr-defined]
+            label.text = output_countdown(app.countdown, app.paused)  # type: ignore[attr-defined]
             app.invalidate()
-            if not app.countdown.seconds:
+            if not app.countdown.seconds:  # type: ignore[attr-defined]
                 break
-            if app.paused:
+            if app.paused:  # type: ignore[attr-defined]
                 await asyncio.sleep(0.1)
             else:
                 await asyncio.sleep(1)
 
-    async def wait_complete():
+    async def wait_complete() -> None:
         tasks = [
             asyncio.create_task(app.run_async()),
             asyncio.create_task(update_countdown()),
@@ -190,7 +193,7 @@ def _countdown(duration, paused):
     loop.run_until_complete(wait_complete())
 
 
-def main(**kwargs):
+def main(**kwargs: Any) -> Any:
     try:
         return cli.main(prog_name=PROG_NAME, **kwargs)
     except PlaysoundException as e:

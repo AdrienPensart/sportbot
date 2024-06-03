@@ -6,7 +6,7 @@ import sys
 from beartype import beartype
 from beartype.typing import Any, Generator, Iterable
 
-from sportbot.exercise import Exercise
+from sportbot.exercises import Exercise
 
 
 class Py2Key:

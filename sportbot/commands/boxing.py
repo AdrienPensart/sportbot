@@ -3,7 +3,7 @@ from beartype import beartype
 from click_skeleton import AdvancedGroup
 
 from sportbot import Boxing, Prepare, Rest, Sequence, TheEnd
-from sportbot.helpers import flatten
+from sportbot.exercises.helpers import flatten
 from sportbot.options import (
     dry_option,
     duration_option,

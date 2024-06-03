@@ -3,15 +3,16 @@ from dataclasses import dataclass
 import click
 from beartype import beartype
 
-from sportbot.helpers import seconds_to_human
-from sportbot.sequence import Sequence
-from sportbot.tag import Tag
+from sportbot.exercises.helpers import seconds_to_human
+from sportbot.exercises.sequence import Sequence
+from sportbot.exercises.tag import Tag
+from sportbot.exercises.waiting import Waiting
 
 
 @beartype
 @dataclass
 class Training:
-    sequences: tuple[Sequence, ...]
+    sequences: tuple[Waiting | Sequence, ...]
     name: str = "Training"
     register: bool = True
 
@@ -25,17 +26,17 @@ class Training:
 
     def __repr__(self) -> str:
         return click.style(
-            f"{self.name} ({len(self.sequences)} sequences), duration: {self.human_total_duration}",
+            f"{self.name} ({len(self.sequences)} sequences), duration: {self.human_duration}",
             fg="blue",
         )
 
     @property
-    def total_duration(self) -> int:
-        return sum(sequence.total_duration for sequence in self.sequences)
+    def duration(self) -> int:
+        return sum(sequence.duration for sequence in self.sequences)
 
     @property
-    def human_total_duration(self) -> str:
-        return seconds_to_human(self.total_duration)
+    def human_duration(self) -> str:
+        return seconds_to_human(self.duration)
 
     def run(self, dry: bool, silence: bool) -> None:
         for sequence in self.sequences:

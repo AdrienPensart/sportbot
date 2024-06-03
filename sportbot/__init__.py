@@ -1,10 +1,10 @@
-from sportbot.boxing import Boxing, BoxingTraining
-from sportbot.exercise import Exercise, KnownExercises
-from sportbot.sequence import EndSequence, KnownSequences, RestSequence, Sequence
+from sportbot.exercises import Exercise, KnownExercises
+from sportbot.exercises.boxing import Boxing, BoxingTraining
+from sportbot.exercises.sequence import KnownSequences, Sequence
+from sportbot.exercises.tag import Tag
+from sportbot.exercises.training import KnownTrainings, Training
+from sportbot.exercises.waiting import Maintain, Prepare, Rest, TheEnd, Waiting
 from sportbot.sound import Bell
-from sportbot.tag import Tag
-from sportbot.training import KnownTrainings, Training
-from sportbot.waiting import Maintain, Prepare, Rest, TheEnd, Waiting
 
 __all__ = [
     "Tag",
@@ -16,8 +16,6 @@ __all__ = [
     "TheEnd",
     "Waiting",
     "Sequence",
-    "EndSequence",
-    "RestSequence",
     "Training",
     "Boxing",
     "BoxingTraining",

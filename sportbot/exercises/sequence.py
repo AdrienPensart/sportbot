@@ -1,5 +1,5 @@
 import copy
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from functools import cached_property
 
 import click
@@ -7,11 +7,11 @@ from beartype import beartype
 from beartype.typing import Self
 from progressbar import ProgressBar, Variable
 
-from sportbot.exercise import Exercise, rhythmic_push_up
-from sportbot.helpers import flatten, intersperse, seconds_to_human
+from sportbot.exercises import Exercise
+from sportbot.exercises.helpers import flatten, intersperse, seconds_to_human
+from sportbot.exercises.tag import Tag
+from sportbot.exercises.waiting import Rest, Waiting
 from sportbot.sound import Bell
-from sportbot.tag import Tag
-from sportbot.waiting import Maintain, Prepare, Rest, TheEnd, Waiting, _5_minutes_rest
 
 
 @beartype
@@ -70,7 +70,8 @@ class Sequence:
         joined_tags = " ".join(tag for tag in self.tags)
         if joined_tags:
             representation += f" ({joined_tags}),"
-        representation += f" {self.length} exercises, duration: {self.human_exercises_duration}, rest: {self.human_rest_duration}, total duration: {self.human_total_duration}"
+        if self.length:
+            representation += f" {self.length} exercises, duration: {self.human_exercises_duration}, rest: {self.human_rest_duration}, total duration: {self.human_duration}"
         return click.style(representation, fg="magenta")
 
     @property
@@ -86,12 +87,12 @@ class Sequence:
         return len(self.only_exercises)
 
     @property
-    def total_duration(self) -> int:
+    def duration(self) -> int:
         return self.exercises_duration + self.rest_duration
 
     @property
-    def human_total_duration(self) -> str:
-        return seconds_to_human(self.total_duration)
+    def human_duration(self) -> str:
+        return seconds_to_human(self.duration)
 
     @property
     def rest_duration(self) -> int:
@@ -118,33 +119,4 @@ class Sequence:
         return seconds_to_human(self.left_stopwatch)
 
 
-@beartype
-@dataclass(repr=False)
-class PrepareSequence(Sequence):
-    name: str = "prepare-sequence"
-    description: str = "Prepare Sequence"
-    exercises: list[Exercise] = field(default_factory=lambda: [Prepare()])
-    register: bool = False
-
-
-@beartype
-@dataclass(repr=False)
-class RestSequence(Sequence):
-    name: str = "rest-sequence"
-    description: str = "Rest Sequence"
-    exercises: list[Exercise] = field(default_factory=lambda: [_5_minutes_rest])
-    register: bool = False
-
-
-@beartype
-@dataclass(repr=False)
-class EndSequence(Sequence):
-    name: str = "end-sequence"
-    description: str = "End Sequence"
-    exercises: list[Exercise] = field(default_factory=lambda: [TheEnd()])
-    register: bool = False
-
-
 KnownSequences: dict[str, Sequence] = {}
-
-_10_rhythmic_push_up = Sequence.rounds(n=10, exercise=rhythmic_push_up, waiting=Maintain())

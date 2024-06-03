@@ -3,7 +3,7 @@ from beartype import beartype
 from click_skeleton import AdvancedGroup
 
 from sportbot import Exercise, KnownExercises
-from sportbot.helpers import Py2Key
+from sportbot.exercises.helpers import Py2Key
 from sportbot.options import dry_option, duration_option, silence_option
 
 

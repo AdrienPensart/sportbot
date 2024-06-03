@@ -1,12 +1,12 @@
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from beartype import beartype
 from progressbar import ProgressBar
 
-from sportbot.exercise import BaseWaiting
+from sportbot.exercises import BaseWaiting, Exercise
+from sportbot.exercises.tag import Tag
 from sportbot.sound import BaseSound
-from sportbot.tag import Tag
 
 
 @beartype
@@ -15,6 +15,7 @@ class Waiting(BaseWaiting):
     name: str = "Waiting"
     color: str = "bright_blue"
     tags: frozenset[Tag] = frozenset({Tag.WAITING})
+    exercises: list[Exercise] = field(default_factory=lambda: [])
 
 
 @beartype
@@ -72,9 +73,9 @@ class Rest(Waiting):
 
 
 # RESTS
-_15_seconds_rest = Rest(duration=15)
-_30_seconds_rest = Rest(duration=30)
-_45_seconds_rest = Rest(duration=45)
-_60_seconds_rest = _1_minute_rest = Rest(duration=60)
-_120_seconds_rest = _2_minutes_rest = Rest(duration=120)
-_5_minutes_rest = Rest(duration=5 * 60)
+_15s_rest = Rest(duration=15)
+_30s_rest = Rest(duration=30)
+_45s_rest = Rest(duration=45)
+_60s_rest = _1mn_rest = Rest(duration=60)
+_120s_rest = _2mn_rest = Rest(duration=120)
+_5mn_rest = Rest(duration=5 * 60)
